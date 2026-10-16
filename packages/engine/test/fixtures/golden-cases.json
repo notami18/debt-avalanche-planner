@@ -1,0 +1,756 @@
+{
+  "generatedBy": "tools/golden-generator/generate.py",
+  "spec": "docs/SPEC-engine.md",
+  "rateConversions": [
+    {
+      "annualEffectiveRate": 0.12,
+      "monthlyRate": 0.009488792934583046
+    },
+    {
+      "annualEffectiveRate": 0.16,
+      "monthlyRate": 0.012445137919713467
+    },
+    {
+      "annualEffectiveRate": 0.21,
+      "monthlyRate": 0.016011867773387367
+    },
+    {
+      "annualEffectiveRate": 0.24,
+      "monthlyRate": 0.018087582483510722
+    },
+    {
+      "annualEffectiveRate": 0.28,
+      "monthlyRate": 0.020784728489500193
+    },
+    {
+      "annualEffectiveRate": 0.3,
+      "monthlyRate": 0.022104450593615876
+    },
+    {
+      "annualEffectiveRate": 0.32,
+      "monthlyRate": 0.023405690796292067
+    },
+    {
+      "annualEffectiveRate": 0.33,
+      "monthlyRate": 0.02404954767981926
+    }
+  ],
+  "cases": [
+    {
+      "name": "un-credito-simple",
+      "learning": "Un solo crédito: avalancha y bola de nieve son idénticas. Sirve para validar conversión de tasa e intereses.",
+      "debts": [
+        {
+          "id": "libre-inversion",
+          "name": "Libre inversión",
+          "balance": 10000000,
+          "annualEffectiveRate": 0.24,
+          "minimumPayment": 500000
+        }
+      ],
+      "monthlyBudget": 500000,
+      "expected": {
+        "avalanche": {
+          "status": "PAID_OFF",
+          "warnings": [],
+          "months": 26,
+          "totalInterest": 2524732,
+          "totalPaid": 12524732,
+          "payoffOrder": [
+            {
+              "debtId": "libre-inversion",
+              "month": 26
+            }
+          ],
+          "firstMonths": [
+            {
+              "month": 1,
+              "rows": [
+                {
+                  "debtId": "libre-inversion",
+                  "openingBalance": 10000000,
+                  "interest": 180876,
+                  "payment": 500000,
+                  "closingBalance": 9680876
+                }
+              ]
+            },
+            {
+              "month": 2,
+              "rows": [
+                {
+                  "debtId": "libre-inversion",
+                  "openingBalance": 9680876,
+                  "interest": 175104,
+                  "payment": 500000,
+                  "closingBalance": 9355980
+                }
+              ]
+            }
+          ]
+        },
+        "snowball": {
+          "status": "PAID_OFF",
+          "warnings": [],
+          "months": 26,
+          "totalInterest": 2524732,
+          "totalPaid": 12524732,
+          "payoffOrder": [
+            {
+              "debtId": "libre-inversion",
+              "month": 26
+            }
+          ],
+          "firstMonths": [
+            {
+              "month": 1,
+              "rows": [
+                {
+                  "debtId": "libre-inversion",
+                  "openingBalance": 10000000,
+                  "interest": 180876,
+                  "payment": 500000,
+                  "closingBalance": 9680876
+                }
+              ]
+            },
+            {
+              "month": 2,
+              "rows": [
+                {
+                  "debtId": "libre-inversion",
+                  "openingBalance": 9680876,
+                  "interest": 175104,
+                  "payment": 500000,
+                  "closingBalance": 9355980
+                }
+              ]
+            }
+          ]
+        },
+        "minimum-only": {
+          "status": "PAID_OFF",
+          "warnings": [],
+          "months": 26,
+          "totalInterest": 2524732,
+          "totalPaid": 12524732,
+          "payoffOrder": [
+            {
+              "debtId": "libre-inversion",
+              "month": 26
+            }
+          ],
+          "firstMonths": [
+            {
+              "month": 1,
+              "rows": [
+                {
+                  "debtId": "libre-inversion",
+                  "openingBalance": 10000000,
+                  "interest": 180876,
+                  "payment": 500000,
+                  "closingBalance": 9680876
+                }
+              ]
+            },
+            {
+              "month": 2,
+              "rows": [
+                {
+                  "debtId": "libre-inversion",
+                  "openingBalance": 9680876,
+                  "interest": 175104,
+                  "payment": 500000,
+                  "closingBalance": 9355980
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "tres-deudas-clasico",
+      "learning": "El caso que muestra la diferencia: avalancha ahorra intereses, bola de nieve cierra una deuda antes.",
+      "debts": [
+        {
+          "id": "tarjeta-a",
+          "name": "Tarjeta A",
+          "balance": 4500000,
+          "annualEffectiveRate": 0.32,
+          "minimumPayment": 225000
+        },
+        {
+          "id": "libre-inversion",
+          "name": "Libre inversión",
+          "balance": 12000000,
+          "annualEffectiveRate": 0.21,
+          "minimumPayment": 480000
+        },
+        {
+          "id": "tarjeta-b",
+          "name": "Tarjeta B",
+          "balance": 1800000,
+          "annualEffectiveRate": 0.28,
+          "minimumPayment": 90000
+        }
+      ],
+      "monthlyBudget": 1300000,
+      "expected": {
+        "avalanche": {
+          "status": "PAID_OFF",
+          "warnings": [],
+          "months": 17,
+          "totalInterest": 2844122,
+          "totalPaid": 21144122,
+          "payoffOrder": [
+            {
+              "debtId": "tarjeta-a",
+              "month": 7
+            },
+            {
+              "debtId": "tarjeta-b",
+              "month": 9
+            },
+            {
+              "debtId": "libre-inversion",
+              "month": 17
+            }
+          ],
+          "firstMonths": [
+            {
+              "month": 1,
+              "rows": [
+                {
+                  "debtId": "tarjeta-a",
+                  "openingBalance": 4500000,
+                  "interest": 105326,
+                  "payment": 730000,
+                  "closingBalance": 3875326
+                },
+                {
+                  "debtId": "tarjeta-b",
+                  "openingBalance": 1800000,
+                  "interest": 37413,
+                  "payment": 90000,
+                  "closingBalance": 1747413
+                },
+                {
+                  "debtId": "libre-inversion",
+                  "openingBalance": 12000000,
+                  "interest": 192142,
+                  "payment": 480000,
+                  "closingBalance": 11712142
+                }
+              ]
+            },
+            {
+              "month": 2,
+              "rows": [
+                {
+                  "debtId": "tarjeta-a",
+                  "openingBalance": 3875326,
+                  "interest": 90705,
+                  "payment": 730000,
+                  "closingBalance": 3236031
+                },
+                {
+                  "debtId": "tarjeta-b",
+                  "openingBalance": 1747413,
+                  "interest": 36320,
+                  "payment": 90000,
+                  "closingBalance": 1693733
+                },
+                {
+                  "debtId": "libre-inversion",
+                  "openingBalance": 11712142,
+                  "interest": 187533,
+                  "payment": 480000,
+                  "closingBalance": 11419675
+                }
+              ]
+            }
+          ]
+        },
+        "snowball": {
+          "status": "PAID_OFF",
+          "warnings": [],
+          "months": 17,
+          "totalInterest": 2874112,
+          "totalPaid": 21174112,
+          "payoffOrder": [
+            {
+              "debtId": "tarjeta-b",
+              "month": 4
+            },
+            {
+              "debtId": "tarjeta-a",
+              "month": 9
+            },
+            {
+              "debtId": "libre-inversion",
+              "month": 17
+            }
+          ],
+          "firstMonths": [
+            {
+              "month": 1,
+              "rows": [
+                {
+                  "debtId": "tarjeta-b",
+                  "openingBalance": 1800000,
+                  "interest": 37413,
+                  "payment": 595000,
+                  "closingBalance": 1242413
+                },
+                {
+                  "debtId": "tarjeta-a",
+                  "openingBalance": 4500000,
+                  "interest": 105326,
+                  "payment": 225000,
+                  "closingBalance": 4380326
+                },
+                {
+                  "debtId": "libre-inversion",
+                  "openingBalance": 12000000,
+                  "interest": 192142,
+                  "payment": 480000,
+                  "closingBalance": 11712142
+                }
+              ]
+            },
+            {
+              "month": 2,
+              "rows": [
+                {
+                  "debtId": "tarjeta-b",
+                  "openingBalance": 1242413,
+                  "interest": 25823,
+                  "payment": 595000,
+                  "closingBalance": 673236
+                },
+                {
+                  "debtId": "tarjeta-a",
+                  "openingBalance": 4380326,
+                  "interest": 102525,
+                  "payment": 225000,
+                  "closingBalance": 4257851
+                },
+                {
+                  "debtId": "libre-inversion",
+                  "openingBalance": 11712142,
+                  "interest": 187533,
+                  "payment": 480000,
+                  "closingBalance": 11419675
+                }
+              ]
+            }
+          ]
+        },
+        "minimum-only": {
+          "status": "PAID_OFF",
+          "warnings": [],
+          "months": 33,
+          "totalInterest": 5642360,
+          "totalPaid": 23942360,
+          "payoffOrder": [
+            {
+              "debtId": "tarjeta-b",
+              "month": 27
+            },
+            {
+              "debtId": "tarjeta-a",
+              "month": 28
+            },
+            {
+              "debtId": "libre-inversion",
+              "month": 33
+            }
+          ],
+          "firstMonths": [
+            {
+              "month": 1,
+              "rows": [
+                {
+                  "debtId": "libre-inversion",
+                  "openingBalance": 12000000,
+                  "interest": 192142,
+                  "payment": 480000,
+                  "closingBalance": 11712142
+                },
+                {
+                  "debtId": "tarjeta-a",
+                  "openingBalance": 4500000,
+                  "interest": 105326,
+                  "payment": 225000,
+                  "closingBalance": 4380326
+                },
+                {
+                  "debtId": "tarjeta-b",
+                  "openingBalance": 1800000,
+                  "interest": 37413,
+                  "payment": 90000,
+                  "closingBalance": 1747413
+                }
+              ]
+            },
+            {
+              "month": 2,
+              "rows": [
+                {
+                  "debtId": "libre-inversion",
+                  "openingBalance": 11712142,
+                  "interest": 187533,
+                  "payment": 480000,
+                  "closingBalance": 11419675
+                },
+                {
+                  "debtId": "tarjeta-a",
+                  "openingBalance": 4380326,
+                  "interest": 102525,
+                  "payment": 225000,
+                  "closingBalance": 4257851
+                },
+                {
+                  "debtId": "tarjeta-b",
+                  "openingBalance": 1747413,
+                  "interest": 36320,
+                  "payment": 90000,
+                  "closingBalance": 1693733
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "mismo-orden",
+      "learning": "Si la deuda más pequeña también es la más cara, ambas estrategias dan exactamente lo mismo.",
+      "debts": [
+        {
+          "id": "tarjeta",
+          "name": "Tarjeta",
+          "balance": 2000000,
+          "annualEffectiveRate": 0.33,
+          "minimumPayment": 100000
+        },
+        {
+          "id": "vehiculo",
+          "name": "Vehículo",
+          "balance": 25000000,
+          "annualEffectiveRate": 0.16,
+          "minimumPayment": 750000
+        }
+      ],
+      "monthlyBudget": 1200000,
+      "expected": {
+        "avalanche": {
+          "status": "PAID_OFF",
+          "warnings": [],
+          "months": 27,
+          "totalInterest": 4968724,
+          "totalPaid": 31968724,
+          "payoffOrder": [
+            {
+              "debtId": "tarjeta",
+              "month": 5
+            },
+            {
+              "debtId": "vehiculo",
+              "month": 27
+            }
+          ],
+          "firstMonths": [
+            {
+              "month": 1,
+              "rows": [
+                {
+                  "debtId": "tarjeta",
+                  "openingBalance": 2000000,
+                  "interest": 48099,
+                  "payment": 450000,
+                  "closingBalance": 1598099
+                },
+                {
+                  "debtId": "vehiculo",
+                  "openingBalance": 25000000,
+                  "interest": 311128,
+                  "payment": 750000,
+                  "closingBalance": 24561128
+                }
+              ]
+            },
+            {
+              "month": 2,
+              "rows": [
+                {
+                  "debtId": "tarjeta",
+                  "openingBalance": 1598099,
+                  "interest": 38434,
+                  "payment": 450000,
+                  "closingBalance": 1186533
+                },
+                {
+                  "debtId": "vehiculo",
+                  "openingBalance": 24561128,
+                  "interest": 305667,
+                  "payment": 750000,
+                  "closingBalance": 24116795
+                }
+              ]
+            }
+          ]
+        },
+        "snowball": {
+          "status": "PAID_OFF",
+          "warnings": [],
+          "months": 27,
+          "totalInterest": 4968724,
+          "totalPaid": 31968724,
+          "payoffOrder": [
+            {
+              "debtId": "tarjeta",
+              "month": 5
+            },
+            {
+              "debtId": "vehiculo",
+              "month": 27
+            }
+          ],
+          "firstMonths": [
+            {
+              "month": 1,
+              "rows": [
+                {
+                  "debtId": "tarjeta",
+                  "openingBalance": 2000000,
+                  "interest": 48099,
+                  "payment": 450000,
+                  "closingBalance": 1598099
+                },
+                {
+                  "debtId": "vehiculo",
+                  "openingBalance": 25000000,
+                  "interest": 311128,
+                  "payment": 750000,
+                  "closingBalance": 24561128
+                }
+              ]
+            },
+            {
+              "month": 2,
+              "rows": [
+                {
+                  "debtId": "tarjeta",
+                  "openingBalance": 1598099,
+                  "interest": 38434,
+                  "payment": 450000,
+                  "closingBalance": 1186533
+                },
+                {
+                  "debtId": "vehiculo",
+                  "openingBalance": 24561128,
+                  "interest": 305667,
+                  "payment": 750000,
+                  "closingBalance": 24116795
+                }
+              ]
+            }
+          ]
+        },
+        "minimum-only": {
+          "status": "PAID_OFF",
+          "warnings": [],
+          "months": 44,
+          "totalInterest": 8255237,
+          "totalPaid": 35255237,
+          "payoffOrder": [
+            {
+              "debtId": "tarjeta",
+              "month": 28
+            },
+            {
+              "debtId": "vehiculo",
+              "month": 44
+            }
+          ],
+          "firstMonths": [
+            {
+              "month": 1,
+              "rows": [
+                {
+                  "debtId": "tarjeta",
+                  "openingBalance": 2000000,
+                  "interest": 48099,
+                  "payment": 100000,
+                  "closingBalance": 1948099
+                },
+                {
+                  "debtId": "vehiculo",
+                  "openingBalance": 25000000,
+                  "interest": 311128,
+                  "payment": 750000,
+                  "closingBalance": 24561128
+                }
+              ]
+            },
+            {
+              "month": 2,
+              "rows": [
+                {
+                  "debtId": "tarjeta",
+                  "openingBalance": 1948099,
+                  "interest": 46851,
+                  "payment": 100000,
+                  "closingBalance": 1894950
+                },
+                {
+                  "debtId": "vehiculo",
+                  "openingBalance": 24561128,
+                  "interest": 305667,
+                  "payment": 750000,
+                  "closingBalance": 24116795
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "trampa-de-minimos",
+      "learning": "La cuota mínima no cubre los intereses: la deuda crece para siempre. El motor debe detectarlo.",
+      "debts": [
+        {
+          "id": "tarjeta-grande",
+          "name": "Tarjeta grande",
+          "balance": 20000000,
+          "annualEffectiveRate": 0.3,
+          "minimumPayment": 300000
+        }
+      ],
+      "monthlyBudget": 300000,
+      "expected": {
+        "avalanche": {
+          "status": "NOT_PAYABLE",
+          "monthsSimulated": 600,
+          "warnings": [
+            {
+              "code": "MINIMUM_BELOW_INTEREST",
+              "debtId": "tarjeta-grande"
+            }
+          ]
+        },
+        "snowball": {
+          "status": "NOT_PAYABLE",
+          "monthsSimulated": 600,
+          "warnings": [
+            {
+              "code": "MINIMUM_BELOW_INTEREST",
+              "debtId": "tarjeta-grande"
+            }
+          ]
+        },
+        "minimum-only": {
+          "status": "NOT_PAYABLE",
+          "monthsSimulated": 600,
+          "warnings": [
+            {
+              "code": "MINIMUM_BELOW_INTEREST",
+              "debtId": "tarjeta-grande"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "presupuesto-insuficiente",
+      "learning": "Validación: el presupuesto no alcanza ni para los mínimos.",
+      "debts": [
+        {
+          "id": "tarjeta-a",
+          "name": "Tarjeta A",
+          "balance": 3000000,
+          "annualEffectiveRate": 0.3,
+          "minimumPayment": 150000
+        },
+        {
+          "id": "tarjeta-b",
+          "name": "Tarjeta B",
+          "balance": 2000000,
+          "annualEffectiveRate": 0.28,
+          "minimumPayment": 100000
+        }
+      ],
+      "monthlyBudget": 200000,
+      "expected": {
+        "avalanche": {
+          "status": "INVALID_BUDGET",
+          "minimumRequired": 250000
+        },
+        "snowball": {
+          "status": "INVALID_BUDGET",
+          "minimumRequired": 250000
+        },
+        "minimum-only": {
+          "status": "PAID_OFF",
+          "warnings": [],
+          "months": 27,
+          "totalInterest": 1616049,
+          "totalPaid": 6616049,
+          "payoffOrder": [
+            {
+              "debtId": "tarjeta-a",
+              "month": 27
+            },
+            {
+              "debtId": "tarjeta-b",
+              "month": 27
+            }
+          ],
+          "firstMonths": [
+            {
+              "month": 1,
+              "rows": [
+                {
+                  "debtId": "tarjeta-a",
+                  "openingBalance": 3000000,
+                  "interest": 66313,
+                  "payment": 150000,
+                  "closingBalance": 2916313
+                },
+                {
+                  "debtId": "tarjeta-b",
+                  "openingBalance": 2000000,
+                  "interest": 41569,
+                  "payment": 100000,
+                  "closingBalance": 1941569
+                }
+              ]
+            },
+            {
+              "month": 2,
+              "rows": [
+                {
+                  "debtId": "tarjeta-a",
+                  "openingBalance": 2916313,
+                  "interest": 64463,
+                  "payment": 150000,
+                  "closingBalance": 2830776
+                },
+                {
+                  "debtId": "tarjeta-b",
+                  "openingBalance": 1941569,
+                  "interest": 40355,
+                  "payment": 100000,
+                  "closingBalance": 1881924
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
