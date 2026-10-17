@@ -1,7 +1,29 @@
+# Dependencias
 node_modules/
+.pnpm-store/
+
+# Builds y caches
 dist/
 coverage/
 .turbo/
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Entorno local
 .env*
 *.local
+
+# Python (tools/golden-generator)
+__pycache__/
+*.py[cod]
+.venv/
+
+# Claude Code: configuración personal (settings.json sí se versiona)
+.claude/settings.local.json
+
+# Sistema operativo
 .DS_Store
