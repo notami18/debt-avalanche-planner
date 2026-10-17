@@ -1,0 +1,15 @@
+---
+description: Reglas de dominio financiero para el motor de simulación de deudas
+globs: packages/engine/**
+alwaysApply: false
+---
+
+- Leé `docs/SPEC-engine.md` antes de cambiar cualquier cosa en el motor.
+- Dinero = pesos COP **enteros**. El único redondeo es el del interés mensual: `Math.round(saldo * tasaMensual)`.
+- Tasa mensual = `(1 + EA) ** (1 / 12) - 1`. Nunca `EA / 12`.
+- Orden mensual estricto: 1) intereses, 2) mínimos en orden de prioridad, 3) excedente en cascada.
+- El orden de prioridad se calcula una sola vez al inicio, con los desempates de la spec.
+- `minimum-only` ignora el presupuesto y no redistribuye la plata liberada.
+- Resultados como unión discriminada por `status`; no lanzar excepciones por errores de negocio.
+- Antes de dar algo por terminado, corré `pnpm -F @avalancha/engine test` y mostrá el resultado.
+- Si un caso dorado falla, el problema está en el motor o en la spec, nunca en el fixture.
