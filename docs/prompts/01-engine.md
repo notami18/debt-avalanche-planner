@@ -80,6 +80,21 @@ Commit sugerido: `feat(engine): implement debt payoff simulation`
 Agrega tests unitarios para INVALID_INPUT (sección 6 de la spec): ids duplicados,
 montos no enteros, montos <= 0, tasa negativa o > 2, cero deudas y más de 20 deudas.
 Agrega también un test de desempate de prioridad para avalanche y snowball.
+
+Cambio de contrato en las validaciones. Primero la spec, después el código:
+
+1. Actualiza docs/SPEC-engine.md §6: cada issue de INVALID_INPUT pasa a ser
+   { path: string; code: ValidationCode }, sin message. Define ValidationCode como unión:
+   'DUPLICATE_ID' | 'NOT_POSITIVE_INTEGER' | 'NOT_FINITE' | 'RATE_OUT_OF_RANGE'
+   | 'NO_DEBTS' | 'TOO_MANY_DEBTS'. Documenta también las decisiones 1, 2, 3 y 5
+   que tomaste (presupuesto validado siempre, NaN/Infinity, orden por código de
+   carácter, pago en el mes 600 = PAID_OFF).
+2. Implementa el cambio en validation.ts y types.ts. Los textos en español serán
+   responsabilidad de la UI, no del motor.
+3. Prompt 4 de docs/prompts/01-engine.md: tests de INVALID_INPUT que verifiquen path y
+   code (nunca textos), más los tests de desempate de prioridad.
+
+No toques golden-cases.json. Corre pnpm test y pnpm typecheck al final.
 ```
 
 Commit sugerido: `test(engine): cover input validation and tie-breaking`

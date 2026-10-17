@@ -16,9 +16,17 @@ export interface PlanInput {
 
 export type Warning = { code: 'MINIMUM_BELOW_INTEREST'; debtId: string };
 
+export type ValidationCode =
+  | 'DUPLICATE_ID'
+  | 'NOT_POSITIVE_INTEGER'
+  | 'NOT_FINITE'
+  | 'RATE_OUT_OF_RANGE'
+  | 'NO_DEBTS'
+  | 'TOO_MANY_DEBTS';
+
 export interface ValidationIssue {
   path: string;
-  message: string;
+  code: ValidationCode;
 }
 
 export interface DebtMonthRow {

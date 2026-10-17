@@ -10,6 +10,7 @@ export type {
   SimulationResult,
   Strategy,
   StrategyComparison,
+  ValidationCode,
   ValidationIssue,
   Warning,
 } from './types.js';

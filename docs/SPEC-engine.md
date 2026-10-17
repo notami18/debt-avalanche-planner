@@ -57,6 +57,7 @@ Los valores esperados están en `rateConversions` de los casos dorados (toleranc
 | `minimum-only` | `id` ascendente | — | — |
 
 El orden es fijo durante toda la simulación (así funciona el método clásico).
+"`id` ascendente" compara por código de carácter, no por idioma (ver §6, decisión 3).
 
 ## 5. Algoritmo mensual
 
@@ -84,7 +85,13 @@ type SimulationResult =
       schedule: MonthRow[] }
   | { status: 'NOT_PAYABLE'; monthsSimulated: 600; warnings: Warning[] }
   | { status: 'INVALID_BUDGET'; minimumRequired: number }
-  | { status: 'INVALID_INPUT'; issues: { path: string; message: string }[] };
+  | { status: 'INVALID_INPUT'; issues: ValidationIssue[] };
+
+type ValidationCode =
+  | 'DUPLICATE_ID' | 'NOT_POSITIVE_INTEGER' | 'NOT_FINITE'
+  | 'RATE_OUT_OF_RANGE' | 'NO_DEBTS' | 'TOO_MANY_DEBTS';
+
+interface ValidationIssue { path: string; code: ValidationCode } // sin texto: la UI traduce
 
 interface MonthRow {
   month: number;
@@ -96,12 +103,42 @@ type Warning = { code: 'MINIMUM_BELOW_INTEREST'; debtId: string };
 ```
 
 - `INVALID_INPUT`: ids duplicados, montos no enteros o ≤ 0, tasa < 0 o > 2 (200 % E.A.),
-  0 deudas o más de 20. Se valida antes que todo lo demás.
+  0 deudas o más de 20. Se valida antes que todo lo demás. El motor devuelve solo `path` y
+  `code`; los textos en español son responsabilidad de la UI.
 - `INVALID_BUDGET`: `monthlyBudget < Σ cuotaMínima` (no aplica a `minimum-only`).
 - `NOT_PAYABLE`: tras **600 meses** (50 años) aún queda saldo.
 - `MINIMUM_BELOW_INTEREST`: la cuota mínima ≤ interés del primer mes
   (`round(balanceInicial × tasaMensual)`). Lista ordenada por `id`. Es una alerta, no un error.
 - `payoffOrder`: ordenado por mes; empates en el mismo mes según el orden de prioridad.
+
+### Códigos de `INVALID_INPUT`
+
+| Regla | `path` | `code` |
+|---|---|---|
+| 0 deudas | `debts` | `NO_DEBTS` |
+| Más de 20 deudas | `debts` | `TOO_MANY_DEBTS` |
+| `id` repetido (2.ª aparición en adelante) | `debts[i].id` | `DUPLICATE_ID` |
+| `balance`, `minimumPayment` o `monthlyBudget` es `NaN` o ±`Infinity` | `debts[i].balance`, `debts[i].minimumPayment`, `monthlyBudget` | `NOT_FINITE` |
+| Esos mismos campos finitos pero no enteros, o ≤ 0 | ídem | `NOT_POSITIVE_INTEGER` |
+| `annualEffectiveRate` es `NaN` o ±`Infinity` | `debts[i].annualEffectiveRate` | `NOT_FINITE` |
+| `annualEffectiveRate` < 0 o > 2 | `debts[i].annualEffectiveRate` | `RATE_OUT_OF_RANGE` |
+
+Se reportan **todos** los problemas (no solo el primero), como máximo uno por campo, en este
+orden fijo: cantidad de `debts`, luego `monthlyBudget`, luego cada deuda en el orden de entrada
+(`id`, `balance`, `minimumPayment`, `annualEffectiveRate`).
+
+### Decisiones
+
+1. **Presupuesto validado siempre.** `monthlyBudget` debe ser entero > 0 en todas las
+   estrategias, incluso en `minimum-only`, aunque esa estrategia luego lo ignore.
+2. **`NaN` e `Infinity`.** Un número no finito produce `NOT_FINITE`, distinto de los errores de
+   rango (`RATE_OUT_OF_RANGE`) o de entero (`NOT_POSITIVE_INTEGER`).
+3. **Orden de `id` por código de carácter.** "`id` ascendente" (§4 y §6) compara unidades de
+   código UTF-16 (`<` / `>`), **no** `localeCompare`. Así, `'B' < 'a'` y `'d10' < 'd9'`.
+   Es determinista e independiente del idioma del navegador.
+5. **Pago en el mes 600 = `PAID_OFF`.** Si la última deuda se cierra justo en el mes 600, el
+   resultado es `PAID_OFF` con `months: 600`. `NOT_PAYABLE` solo aplica si queda saldo al
+   terminar el mes 600.
 
 ## 7. API pública del paquete
 
