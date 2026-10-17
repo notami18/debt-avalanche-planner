@@ -40,6 +40,12 @@ Escribe SOLO los tests (todavía sin implementación) en packages/engine/test/:
 
 Crea src/index.ts exportando las firmas de la sección 7 con "throw new Error('not implemented')".
 Corre los tests: deben compilar y FALLAR. Muéstrame la salida.
+
+Ajustes:
+- Para importar el JSON, habilita "resolveJsonModule": true en tsconfig si hace falta,
+  y verifica que pnpm typecheck pase.
+- Define un tipo TypeScript para la forma del fixture en test/; nada de any ni casts a any.
+
 ```
 
 Commit sugerido: `test(engine): add golden cases as failing specs`
