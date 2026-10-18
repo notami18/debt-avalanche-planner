@@ -59,7 +59,7 @@ Corre pnpm install, pnpm test, pnpm typecheck y pnpm build, y muéstrame la sali
 Al final dime el comando para abrir la app en el navegador.
 ```
 
-Commit: `feat(web): scaffold vite react app wired to engine`
+Commit: `feat(web): 🧑‍💻 scaffold vite react app wired to engine`
 
 **Revisá:** abrí la app con `pnpm dev`. Cambiá algo en `packages/engine/src` y fijate si la
 web se recarga sola. (Debería: el motor exporta su código fuente directamente.)
