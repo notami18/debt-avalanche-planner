@@ -5,6 +5,7 @@ import { DebtList } from './components/DebtList.js';
 import { FirstPaymentField } from './components/FirstPaymentField.js';
 import { PlanActions } from './components/PlanActions.js';
 import { PlanResults } from './components/PlanResults.js';
+import { resultMessages } from './i18n/resultMessages.js';
 import { fieldId } from './plan/fields.js';
 import { usePlan } from './plan/usePlan.js';
 import buttons from './styles/buttons.module.css';
@@ -38,13 +39,16 @@ export function App() {
           <PlanActions onLoadExample={plan.loadExample} onClear={plan.clear} />
         </form>
         <PlanResults
-          hasDebts={plan.form.debts.length > 0}
+          debts={plan.debts}
           comparison={plan.comparison}
           selected={plan.selected}
           onSelect={plan.select}
           firstPayment={plan.form.firstPayment}
         />
       </div>
+      <footer className={styles.footer}>
+        <p>{resultMessages.disclaimer}</p>
+      </footer>
     </div>
   );
 }

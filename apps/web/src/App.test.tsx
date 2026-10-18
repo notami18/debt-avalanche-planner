@@ -22,6 +22,9 @@ describe('App', () => {
     expect(screen.getByRole('heading', { name: 'Avalancha' })).toBeInTheDocument();
     expect(screen.getByText(EMPTY_STATE)).toBeInTheDocument();
     expect(debtRows()).toHaveLength(0);
+    expect(screen.getByRole('contentinfo')).toHaveTextContent(
+      'Avalancha es un simulador educativo, no asesoría financiera.',
+    );
   });
 
   it('adds an empty debt without showing errors, and pauses results quietly', () => {

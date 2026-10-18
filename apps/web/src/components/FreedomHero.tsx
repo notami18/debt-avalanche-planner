@@ -1,14 +1,15 @@
 import type { StrategyComparison } from '@avalancha/engine';
+import type { CSSProperties } from 'react';
 import { useState } from 'react';
 import { formatMonthYear, monthToDate } from '../format/dates.js';
 import { formatMoney } from '../format/money.js';
 import { resultMessages } from '../i18n/resultMessages.js';
-import { balanceSeries } from '../plan/balanceSeries.js';
 import { STRATEGIES } from '../plan/strategies.js';
 import type { StrategyKey } from '../plan/strategies.js';
 import { interestSummary } from '../plan/summary.js';
 import type { InterestSummary } from '../plan/summary.js';
 import styles from './FreedomHero.module.css';
+import { HEIGHT, WIDTH, mountainGeometry } from './mountainGeometry.js';
 
 interface FreedomHeroProps {
   comparison: StrategyComparison;
@@ -18,10 +19,8 @@ interface FreedomHeroProps {
   animate: boolean;
 }
 
-const WIDTH = 640;
-const HEIGHT = 280;
-// Espacio libre arriba para la etiqueta de la fecha.
-const HEADROOM = 72;
+const strategyName = (key: StrategyKey) =>
+  STRATEGIES.find((strategy) => strategy.key === key)?.name ?? key;
 
 function interestSentence(summary: InterestSummary): string {
   const interest = `Pagarás ${formatMoney(summary.interest)} en intereses`;
@@ -37,39 +36,32 @@ function interestSentence(summary: InterestSummary): string {
   }
 }
 
+/** Ancla la etiqueta a la izquierda o a la derecha según su lado del gráfico. */
+function horizontalAnchor(xPercent: number): CSSProperties {
+  return xPercent <= 50 ? { left: `${xPercent}%` } : { right: `${100 - xPercent}%` };
+}
+
+/** Muestra de línea con el mismo color, trazo y grosor que la cresta. */
+function StrokeSwatch({ strategy }: { strategy: StrategyKey }) {
+  return (
+    <svg className={styles.swatch} viewBox="0 0 28 10">
+      <g className={styles[strategy]}>
+        <line className={styles.crest} x1={2} y1={5} x2={26} y2={5} />
+      </g>
+    </svg>
+  );
+}
+
 export function FreedomHero({ comparison, selected, firstPayment, animate }: FreedomHeroProps) {
   // Se fija al montar: si cambian los datos durante la animación, no se corta ni se repite.
   const [animateOnMount] = useState(animate);
-  const result = comparison[selected];
+  const geometry = mountainGeometry(comparison, selected);
   const summary = interestSummary(comparison, selected);
-  if (result.status !== 'PAID_OFF' || summary === null) return null;
+  if (geometry === null || summary === null) return null;
 
-  // Solo las estrategias que pagan; el eje X va hasta la más larga.
-  const crests = STRATEGIES.flatMap((strategy) => {
-    const crest = comparison[strategy.key];
-    return crest.status === 'PAID_OFF'
-      ? [{ key: strategy.key, series: balanceSeries(crest.schedule) }]
-      : [];
-  });
-  const maxMonths = Math.max(...crests.map((crest) => crest.series.length - 1));
-  const maxBalance = Math.max(...crests.map((crest) => crest.series[0] ?? 0));
-  const x = (month: number) => (month / maxMonths) * WIDTH;
-  const y = (balance: number) => HEIGHT - (balance / maxBalance) * (HEIGHT - HEADROOM);
-  const line = (series: number[]) =>
-    series
-      .map((balance, month) => `${month === 0 ? 'M' : 'L'}${x(month).toFixed(1)} ${y(balance).toFixed(1)}`)
-      .join(' ');
-
-  // La seleccionada se dibuja al final, encima de las demás.
-  const ordered = [
-    ...crests.filter((crest) => crest.key !== selected),
-    ...crests.filter((crest) => crest.key === selected),
-  ];
-  const markerX = x(result.months);
-  const markerPercent = (markerX / WIDTH) * 100;
-  const freedomDate = formatMonthYear(monthToDate(firstPayment, result.months));
-  const labelPosition =
-    markerPercent <= 50 ? { left: `${markerPercent}%` } : { right: `${100 - markerPercent}%` };
+  const { marker, summit } = geometry;
+  const dateOf = (month: number) => formatMonthYear(monthToDate(firstPayment, month));
+  const freedomDate = dateOf(marker.month);
 
   return (
     <figure className={styles.hero}>
@@ -80,35 +72,42 @@ export function FreedomHero({ comparison, selected, firstPayment, animate }: Fre
           role="presentation"
         >
           <line className={styles.baseline} x1={0} y1={HEIGHT} x2={WIDTH} y2={HEIGHT} />
-          <line className={styles.guide} x1={markerX} y1={HEIGHT} x2={markerX} y2={0} />
-          {ordered.map((crest) => {
-            const path = line(crest.series);
-            const isSelected = crest.key === selected;
-            return (
-              <g
-                key={crest.key}
-                data-strategy={crest.key}
-                className={`${styles[crest.key]} ${isSelected ? styles.selected : ''}`}
-              >
-                {isSelected && (
-                  <path
-                    className={styles.area}
-                    d={`${path} L${x(crest.series.length - 1).toFixed(1)} ${HEIGHT} L0 ${HEIGHT} Z`}
-                  />
-                )}
-                <path className={styles.crest} d={path} />
-              </g>
-            );
-          })}
-          <circle className={styles.marker} cx={markerX} cy={HEIGHT} r={7} />
+          <line className={styles.guide} x1={marker.x} y1={HEIGHT} x2={marker.x} y2={0} />
+          {geometry.crests.map((crest) => (
+            <g
+              key={crest.key}
+              data-strategy={crest.key}
+              className={`${styles[crest.key]} ${crest.area ? styles.selected : ''}`}
+            >
+              {crest.area && <path className={styles.area} d={crest.area} />}
+              <path className={styles.crest} d={crest.line} />
+            </g>
+          ))}
+          <circle className={styles.marker} cx={marker.x} cy={HEIGHT} r={7} />
         </svg>
+        <p className={styles.summit} style={{ top: `${summit.yPercent}%` }}>
+          Hoy: {formatMoney(summit.balance)}
+        </p>
         <p
-          className={markerPercent <= 50 ? styles.label : `${styles.label} ${styles.labelEnd}`}
-          style={labelPosition}
+          className={marker.xPercent <= 50 ? styles.label : `${styles.label} ${styles.labelEnd}`}
+          style={horizontalAnchor(marker.xPercent)}
         >
           <span className={styles.labelKicker}>Libre en</span>
           <span className={styles.labelDate}>{freedomDate}</span>
         </p>
+        {geometry.endLabels.map((label) => (
+          <p
+            key={label.month}
+            data-end-label={label.keys.join(' ')}
+            className={styles.endLabel}
+            style={{ ...horizontalAnchor(label.xPercent), bottom: `${0.5 + label.row * 1.75}rem` }}
+          >
+            {label.keys.map((key) => (
+              <StrokeSwatch key={key} strategy={key} />
+            ))}
+            {label.keys.map(strategyName).join(' y ')}: {dateOf(label.month)}
+          </p>
+        ))}
       </div>
       <figcaption className={styles.caption}>
         <span className={styles.visuallyHidden}>Libre en {freedomDate}. </span>

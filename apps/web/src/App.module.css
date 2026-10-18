@@ -39,6 +39,18 @@
   min-width: 0;
 }
 
+.footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--hielo);
+  font-size: 0.875rem;
+  max-width: 70ch;
+}
+
+.footer p {
+  margin: 0;
+}
+
 @media (min-width: 960px) {
   .page {
     padding: 1.5rem 2rem;

@@ -113,7 +113,9 @@ detalle (por defecto, avalancha).
 
 `TrapNotice` (warning `MINIMUM_BELOW_INTEREST`): nombra la deuda y explica en una línea:
 *"La cuota mínima de Tarjeta grande no alcanza a cubrir los intereses del mes: la deuda
-crece aunque pagues."*
+crece aunque pagues."* Aparece siempre que el motor devuelva el warning, con `PAID_OFF` o
+con `NOT_PAYABLE` (en el estado mixto explica por qué solo mínimos no termina). Una línea
+por deuda afectada.
 
 ## 5. Pantalla de resultados
 
@@ -124,6 +126,13 @@ crece aunque pagues."*
    tipografía grande. Debajo, una línea: *"Pagarás $2.844.122 en intereses: $2.798.238
    menos que pagando solo los mínimos."*
    - Solo se dibujan las estrategias `PAID_OFF`; el eje X va hasta la más larga de ellas.
+   - La escala vertical usa el máximo de todos los puntos de todas las crestas (un saldo
+     puede subir antes de bajar).
+   - Cada cresta no seleccionada lleva una etiqueta directa en su final, con nombre y
+     fecha (*"Solo mínimos: julio de 2029"*) y una muestra de línea con su mismo trazo.
+     Si dos crestas no seleccionadas terminan el mismo mes, van en una sola etiqueta
+     (*"Avalancha y Bola de nieve: marzo de 2028"*).
+   - En la cima, una etiqueta con el saldo inicial: *"Hoy: $ 18.300.000"*.
    - Variantes de la línea: sin diferencia, *"Pagarás $X en intereses, lo mismo que
      pagando solo los mínimos."*; si solo mínimos es `NOT_PAYABLE`, *"Pagarás $X en
      intereses. Pagando solo los mínimos, esta deuda no se acabaría nunca."*
@@ -138,10 +147,12 @@ crece aunque pagues."*
      intereses "—".
    - Si solo mínimos es `NOT_PAYABLE`, la columna de ahorro muestra "—" y bajo la tabla
      va la nota *"Pagando solo los mínimos, esta deuda no se acabaría nunca."*
-3. **PayoffTimeline.** Lista ordenada (sí es una secuencia): qué deuda se cierra y cuándo.
+3. **PayoffTimeline.** Lista ordenada (sí es una secuencia): qué deuda se cierra y cuándo,
+   de la estrategia seleccionada. Cada ítem: *"Tarjeta A, abril de 2027"*.
 4. **Schedule.** `<details>` cerrado por defecto: "Ver el plan mes a mes". Tabla con mes,
-   deuda, saldo inicial, interés, pago, saldo final. Muestra 24 meses y un botón
-   "Mostrar todos los meses".
+   deuda, saldo inicial, interés, pago, saldo final (un grupo de filas por mes). Muestra
+   24 meses y, si hay más, un botón "Mostrar todos los meses".
+   - PayoffTimeline y Schedule solo aparecen si la estrategia seleccionada es `PAID_OFF`.
 5. **Nota al pie:** *"Avalancha es un simulador educativo, no asesoría financiera. Tu banco
    puede calcular distinto: cuotas de manejo, seguros o cambios de tasa."*
 

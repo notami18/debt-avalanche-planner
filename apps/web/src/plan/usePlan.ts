@@ -31,10 +31,11 @@ export function usePlan() {
   }, [form]);
 
   // Una sola llamada al motor: resultados y validación salen de aquí (SPEC-web §2).
-  const comparison = useMemo(() => {
-    const { debts, monthlyBudget } = toEngineInput(form);
-    return compareStrategies(debts, monthlyBudget);
-  }, [form]);
+  const engineInput = useMemo(() => toEngineInput(form), [form]);
+  const comparison = useMemo(
+    () => compareStrategies(engineInput.debts, engineInput.monthlyBudget),
+    [engineInput],
+  );
   const issues = useMemo(() => inputIssues(comparison.avalanche), [comparison]);
   const fieldErrors = useMemo(() => issuesByField(issues, form.debts), [issues, form.debts]);
 
@@ -59,6 +60,7 @@ export function usePlan() {
 
   return {
     form,
+    debts: engineInput.debts,
     comparison,
     issues,
     selected,

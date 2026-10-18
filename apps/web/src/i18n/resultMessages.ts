@@ -8,4 +8,8 @@ export const resultMessages = {
   minimumNeverEnds: 'Pagando solo los mínimos, esta deuda no se acabaría nunca.',
   budgetTooLow: (minimumRequired: number) =>
     `Para cubrir los mínimos necesitas al menos ${formatMoney(minimumRequired)} al mes.`,
+  minimumBelowInterest: (debtName: string) =>
+    `La cuota mínima de ${debtName} no alcanza a cubrir los intereses del mes: la deuda crece aunque pagues.`,
+  disclaimer:
+    'Avalancha es un simulador educativo, no asesoría financiera. Tu banco puede calcular distinto: cuotas de manejo, seguros o cambios de tasa.',
 };

@@ -1,0 +1,54 @@
+.schedule {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 1.125rem;
+}
+
+.schedule[open] > .summary {
+  margin-bottom: 0.75rem;
+}
+
+/* La tabla puede desplazarse sola en móvil; la página no. */
+.scroll {
+  overflow-x: auto;
+  margin-bottom: 0.75rem;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.table th,
+.table td {
+  padding: 0.375rem 0.5rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.table thead th {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  vertical-align: bottom;
+  border-bottom: 1px solid var(--roca);
+}
+
+.month {
+  border-bottom: 1px solid var(--hielo);
+}
+
+.monthName {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.table .number {
+  text-align: right;
+  white-space: nowrap;
+}

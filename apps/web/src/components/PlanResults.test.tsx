@@ -1,5 +1,5 @@
 import { compareStrategies } from '@avalancha/engine';
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { resultMessages } from '../i18n/resultMessages.js';
 import type { StrategyKey } from '../plan/strategies.js';
@@ -17,7 +17,7 @@ const normalize = (text: string | null) => (text ?? '').replace(/\s/g, ' ');
 function renderResults({ debts, monthlyBudget }: TestCase, selected: StrategyKey = 'avalanche') {
   return render(
     <PlanResults
-      hasDebts={debts.length > 0}
+      debts={debts}
       comparison={compareStrategies(debts, monthlyBudget)}
       selected={selected}
       onSelect={() => {}}
@@ -109,5 +109,49 @@ describe('PlanResults', () => {
     expect(screen.getByText(resultMessages.notPayable)).toBeInTheDocument();
     expect(screen.getAllByText('No se termina de pagar')).toHaveLength(3);
     expect(screen.queryByRole('figure')).not.toBeInTheDocument();
+    expect(screen.getByRole('note')).toHaveTextContent('Tarjeta grande');
+    // Sin plan que pagar no hay orden de pago ni cronograma.
+    expect(screen.queryByText('Orden de pago')).not.toBeInTheDocument();
+    expect(screen.queryByText('Ver el plan mes a mes')).not.toBeInTheDocument();
+  });
+
+  it('mixed case: the trap notice explains why minimums never end', () => {
+    renderResults(MINIMUM_NEVER_ENDS);
+
+    expect(screen.getByRole('note')).toHaveTextContent(
+      resultMessages.minimumBelowInterest('Tarjeta grande'),
+    );
+  });
+
+  it('lists the payoff order of the selected strategy', () => {
+    renderResults(CLASSIC);
+
+    const items = within(screen.getByRole('list')).getAllByRole('listitem');
+    expect(items.map((item) => item.textContent)).toEqual([
+      'Tarjeta A, julio de 2027',
+      'Tarjeta B, septiembre de 2027',
+      'Libre inversión, mayo de 2028',
+    ]);
+  });
+
+  it('keeps the schedule closed, with every month when it fits in 24', () => {
+    const { container } = renderResults(CLASSIC);
+
+    const details = container.querySelector('details');
+    expect(details).not.toHaveAttribute('open');
+    expect(within(details as HTMLElement).getByText('Ver el plan mes a mes')).toBeInTheDocument();
+    expect(details?.querySelectorAll('tbody')).toHaveLength(17);
+    expect(screen.queryByRole('button', { name: 'Mostrar todos los meses' })).not.toBeInTheDocument();
+  });
+
+  it('shows 24 months first and every month on demand', () => {
+    const { container } = renderResults(CLASSIC, 'minimumOnly');
+    const months = () => container.querySelectorAll('details tbody');
+
+    expect(months()).toHaveLength(24);
+    fireEvent.click(screen.getByRole('button', { name: 'Mostrar todos los meses' }));
+
+    expect(months()).toHaveLength(33);
+    expect(screen.queryByRole('button', { name: 'Mostrar todos los meses' })).not.toBeInTheDocument();
   });
 });
