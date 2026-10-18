@@ -1,0 +1,16 @@
+---
+description: Reglas de la interfaz web (apps/web)
+globs: apps/web/**
+alwaysApply: false
+---
+
+- Leé `docs/SPEC-web.md` antes de cambiar la web. Si algo no está en la spec, preguntá antes de inventarlo.
+- Importá solo la API pública de `@avalancha/engine`. Cero fórmulas financieras en la web.
+- No dupliques validaciones de negocio: mapeá `ValidationIssue.path` al campo y `code` al texto de `i18n/validationMessages.ts`.
+- El formulario guarda strings; `plan/toEngineInput.ts` convierte a tipos del motor. Ese adaptador lleva tests.
+- Dinero y fechas solo con los helpers de `format/` (Intl es-CO). Ojo: la moneda es-CO usa espacio no separable después de `$`.
+- Estilos con CSS Modules y los tokens de `styles/tokens.css`. Nada de colores sueltos en los componentes.
+- Accesibilidad: todo input con `<label>`, errores con `aria-describedby`, foco visible, `prefers-reduced-motion`.
+- Textos en español de Colombia, tuteo, botones que dicen lo que hacen. Nada de MAYÚSCULAS en etiquetas ni `→` en botones.
+- localStorage siempre dentro de try/catch; si falla, la app arranca vacía.
+- Antes de dar algo por terminado: `pnpm -F @avalancha/web test` y `pnpm typecheck`, y mostrá la salida.

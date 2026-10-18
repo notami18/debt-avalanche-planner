@@ -13,24 +13,35 @@ en Colombia. Proyecto personal de aprendizaje: finanzas + desarrollo asistido po
 ## Stack
 - Monorepo **pnpm + Turborepo**, Node.js 22, TypeScript `strict`, ESM.
 - `packages/engine`: TypeScript sin dependencias de runtime. Tests con **Vitest**.
-- `apps/web` (después): Vite + React.
+- `apps/web`: Vite + React, CSS Modules con tokens en variables CSS, Vitest + Testing Library.
+  Especificada en `docs/SPEC-web.md`. Leé esa spec antes de tocar la web.
 
 ## Estructura
 ```
 packages/engine/
   src/            dominio: tasas, simulación, estrategias, validación
   test/           tests Vitest + fixtures/golden-cases.json
-docs/             SPEC-engine.md y prompts de trabajo
+apps/web/
+  src/            UI: plan/ (estado y adaptador al motor), format/, i18n/, components/, styles/
+docs/             SPEC-engine.md, SPEC-web.md y prompts de trabajo
 tools/golden-generator/  implementación de referencia en Python (NO tocar, ver abajo)
 ```
 
 ## Comandos
 ```
 pnpm install
+pnpm dev           # turbo run dev (app web en modo desarrollo)
+pnpm build
 pnpm test          # turbo run test
 pnpm -F @avalancha/engine test
+pnpm -F @avalancha/web test
 pnpm typecheck
 ```
+
+## Frontera entre web y motor
+- La web importa solo la API pública de `@avalancha/engine`. Ninguna fórmula financiera vive
+  en la web: si hace falta una, se agrega al motor (spec → tests → código).
+- La web no duplica validaciones de negocio: muestra los `ValidationIssue` del motor.
 
 ## Convenciones
 - Commits en inglés, **Conventional Commits** (`feat(engine): ...`, `test(engine): ...`).
@@ -45,3 +56,4 @@ pnpm typecheck
 - No editar `golden-cases.json` a mano.
 - No usar datos financieros reales de nadie en el repo (ni fixtures, ni ejemplos, ni seeds).
 - No agregar dependencias de runtime al motor.
+- En la web: nada de analítica, CDNs ni fuentes cargadas desde terceros en tiempo de ejecución.
