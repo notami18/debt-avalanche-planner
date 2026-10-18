@@ -155,9 +155,17 @@ Lee docs/SPEC-web.md §4 y §5 (puntos 3, 4 y 5).
 - Un test de TrapNotice con el caso trampa-de-minimos.
 
 No toques golden-cases.json. Corre pnpm test y pnpm typecheck.
+
+Ajustes a la montaña (SPEC-web §5.1 primero):
+- Etiqueta directa al final de cada cresta no seleccionada con nombre y fecha
+  ("Solo mínimos: julio de 2029"), con el mismo estilo de trazo que su línea.
+  Si dos crestas terminan el mismo mes, una sola etiqueta con ambos nombres.
+- Etiqueta en la cima con el saldo inicial: "Hoy: $ 18.300.000".
+- La escala vertical usa el máximo de todos los puntos de todas las crestas, no
+  series[0]. Con test.
 ```
 
-Commit: `feat(web): add payoff timeline, schedule and golden ui test`
+Commit: `feat(web): 🧑‍💻 add payoff timeline, schedule and golden ui test`
 
 **Revisá:** este test conecta los tres niveles: generador de Python → motor → pantalla. Si
 pasa, lo que ve el usuario es lo mismo que calculó la implementación independiente.
