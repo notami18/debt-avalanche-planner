@@ -1,4 +1,4 @@
-export { toMonthlyRate } from './rates.js';
+export { toAnnualEffectiveRate, toMonthlyRate } from './rates.js';
 export { simulate } from './simulate.js';
 export { compareStrategies } from './compare.js';
 export type {

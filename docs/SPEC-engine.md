@@ -48,6 +48,16 @@ tasaMensual = (1 + EA)^(1/12) − 1
 ⚠️ **No** es `EA / 12`. Ejemplo: 28 % E.A. → 2,0785 % mensual (no 2,333 %).
 Los valores esperados están en `rateConversions` de los casos dorados (tolerancia `1e-12`).
 
+Conversión inversa, para cuando el extracto trae la tasa **mes vencido (M.V.)**:
+
+```
+tasaEA = (1 + tasaMensual)^12 − 1
+```
+
+La ida y vuelta E.A. → mensual → E.A. puede diferir en el orden de `1e-15` por punto flotante
+(ej. `0.28` vuelve como `0.2799999999999998`). Por eso los tests comparan con tolerancia
+`1e-12` y la UI redondea al mostrar.
+
 ## 4. Orden de prioridad (se calcula UNA vez, al inicio)
 
 | Estrategia | Criterio principal | Desempate 1 | Desempate 2 |
@@ -144,6 +154,7 @@ orden fijo: cantidad de `debts`, luego `monthlyBudget`, luego cada deuda en el o
 
 ```ts
 toMonthlyRate(annualEffectiveRate: number): number
+toAnnualEffectiveRate(monthlyRate: number): number
 simulate(input: PlanInput): SimulationResult
 compareStrategies(debts: Debt[], monthlyBudget: number): {
   avalanche: SimulationResult;
