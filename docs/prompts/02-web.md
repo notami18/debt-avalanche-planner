@@ -69,6 +69,12 @@ web se recarga sola. (Debería: el motor exporta su código fuente directamente.
 ## Prompt 7 — Formulario, estado y persistencia
 
 ```
+Ajuste a la spec (primero en docs/SPEC-web.md §3, después en el código):
+- Los errores de un campo se muestran solo después de que el usuario lo tocó (blur)
+  o cuando intenta ver resultados. Una deuda recién agregada, vacía, no muestra errores.
+- Mientras haya errores, los resultados quedan en pausa sin gritar: el estado vacío
+  o "Completa los datos de tus deudas para ver tu plan".
+
 Lee docs/SPEC-web.md §2, §3 y §7. Implementa la captura de datos, todavía sin resultados:
 
 - plan/types.ts: el estado del formulario guarda strings (lo que el usuario escribió),
@@ -95,7 +101,7 @@ Tests:
 No calcules todavía los resultados en la UI. Corre pnpm test y pnpm typecheck.
 ```
 
-Commit: `feat(web): capture debts and budget with local persistence`
+Commit: `feat(web): 🧑‍💻 capture debts and budget with local persistence`
 
 **Revisá:** ¿hay alguna validación de negocio duplicada en la web (por ejemplo, "si
 saldo <= 0")? No debería: eso lo dice el motor.
