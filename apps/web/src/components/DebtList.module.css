@@ -1,0 +1,14 @@
+.list {
+  display: grid;
+  gap: 1rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.note {
+  margin: 0.5rem 0 0;
+  font-size: 0.8125rem;
+}

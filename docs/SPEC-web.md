@@ -54,6 +54,21 @@ Reglas:
 - Ids con `crypto.randomUUID()`. Máximo 20 deudas (el botón de agregar se desactiva).
 - Texto de ayuda del tipo de tasa: *"Tu extracto suele traer las dos. La E.A. es la que
   realmente crece tu deuda en un año."*
+- Debajo de la tasa, una línea con la equivalencia en vivo, calculada con `toMonthlyRate` /
+  `toAnnualEffectiveRate` del motor: *"28 % E.A. equivale a 2,08 % mes vencido"*, o al
+  revés si el tipo es M.V.: *"2 % M.V. equivale a 26,82 % E.A."*. Porcentajes con
+  `Intl.NumberFormat('es-CO', { style: 'percent' })` y hasta 2 decimales. Solo aparece si
+  la tasa escrita es un número finito.
+
+### Errores en los campos
+- Los errores del motor se muestran en un campo solo después de que la persona lo tocó
+  (al salir de él) o cuando presiona **"Ver mi plan"**. Una deuda recién agregada y vacía
+  no muestra errores.
+- "Ver mi plan" (al final del formulario; también con Enter) muestra todos los errores y
+  lleva el foco al primer campo con error. No bloquea nada: con datos válidos el cálculo
+  sigue siendo en vivo.
+- Mientras haya errores, los resultados quedan en pausa sin gritar: el estado vacío (sin
+  deudas) o *"Completa los datos de tus deudas para ver tu plan."*
 
 ### Plan
 - **Presupuesto mensual:** "¿Cuánto puedes destinar en total a tus deudas cada mes?"
@@ -61,7 +76,8 @@ Reglas:
   el "mes N" del motor se convierte en fecha: `marzo de 2028`.
 - **Botón "Cargar ejemplo":** llena el caso ficticio `tres-deudas-clasico` de los casos
   dorados (Tarjeta A, Libre inversión, Tarjeta B; presupuesto $1.300.000).
-- **Botón "Borrar mis datos":** limpia el formulario y el almacenamiento, con confirmación.
+- **Botón "Borrar mis datos":** limpia el formulario y el almacenamiento, con confirmación
+  en línea: el botón se reemplaza por *"¿Borrar todo?"*, "Sí, borrar" y "Cancelar".
 
 ### Persistencia
 - `localStorage`, clave `avalancha:plan:v1`, objeto `{ version: 1, ... }` con lo que el
@@ -77,7 +93,7 @@ detalle (por defecto, avalancha).
 | Resultado del motor | Qué muestra la UI |
 |---|---|
 | Sin deudas | Estado vacío: *"Agrega tu primera deuda o carga un ejemplo para ver cómo funciona."* |
-| `INVALID_INPUT` | Mensaje en el campo exacto (según `path`). Resultados en pausa. |
+| `INVALID_INPUT` | Mensaje en el campo exacto (según `path`) cuando ya se tocó (ver §3, "Errores en los campos"). Resultados en pausa: *"Completa los datos de tus deudas para ver tu plan."* |
 | `INVALID_BUDGET` | En el presupuesto: *"Para cubrir los mínimos necesitas al menos $X al mes."* |
 | `NOT_PAYABLE` | Hero alterno: *"Con estos pagos, esta deuda no se termina de pagar."* + `TrapNotice`. |
 | `PAID_OFF` | Hero con la fecha de libertad, comparación, orden de pago y cronograma. |

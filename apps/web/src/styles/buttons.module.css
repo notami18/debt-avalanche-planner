@@ -1,0 +1,29 @@
+.button {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.5rem 0.875rem;
+  border-radius: 6px;
+  border: 1px solid var(--glaciar);
+  background: transparent;
+  color: var(--pizarra);
+  cursor: pointer;
+}
+
+.button:disabled {
+  border-color: var(--roca);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.primary {
+  composes: button;
+  background: var(--glaciar);
+  color: var(--nieve);
+}
+
+.quiet {
+  composes: button;
+  border-color: transparent;
+  text-decoration: underline;
+  padding-inline: 0.25rem;
+}

@@ -1,0 +1,36 @@
+.field {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.label {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.input {
+  width: 100%;
+  min-width: 0;
+  font: inherit;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--roca);
+  border-radius: 6px;
+  background: var(--nieve);
+  color: var(--pizarra);
+}
+
+.input[aria-invalid='true'] {
+  border: 2px solid var(--senal);
+}
+
+.hint,
+.error {
+  margin: 0;
+  font-size: 0.8125rem;
+}
+
+.error {
+  padding-left: 0.5rem;
+  border-left: 3px solid var(--senal);
+}

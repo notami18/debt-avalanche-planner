@@ -1,0 +1,62 @@
+import styles from './TextField.module.css';
+
+interface TextFieldProps {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  onBlur: () => void;
+  inputMode?: 'text' | 'numeric' | 'decimal' | undefined;
+  placeholder?: string | undefined;
+  hint?: string | undefined;
+  error?: string | undefined;
+}
+
+export function TextField({
+  id,
+  label,
+  value,
+  onChange,
+  onBlur,
+  inputMode = 'text',
+  placeholder,
+  hint,
+  error,
+}: TextFieldProps) {
+  const hintId = `${id}-hint`;
+  const errorId = `${id}-error`;
+  const describedBy = [hint ? hintId : null, error ? errorId : null]
+    .filter((part) => part !== null)
+    .join(' ');
+
+  return (
+    <div className={styles.field}>
+      <label className={styles.label} htmlFor={id}>
+        {label}
+      </label>
+      <input
+        id={id}
+        className={styles.input}
+        type="text"
+        inputMode={inputMode}
+        autoComplete="off"
+        placeholder={placeholder}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        onBlur={onBlur}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy || undefined}
+      />
+      {hint && (
+        <p id={hintId} className={styles.hint}>
+          {hint}
+        </p>
+      )}
+      {error && (
+        <p id={errorId} className={styles.error}>
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}

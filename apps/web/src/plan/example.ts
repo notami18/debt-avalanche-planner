@@ -1,28 +1,33 @@
-import type { Debt } from '@avalancha/engine';
+import type { PlanForm } from './types.js';
 
-// Fictional data from the golden case "tres-deudas-clasico".
-export const EXAMPLE_DEBTS: Debt[] = [
-  {
-    id: 'tarjeta-a',
-    name: 'Tarjeta A',
-    balance: 4_500_000,
-    annualEffectiveRate: 0.32,
-    minimumPayment: 225_000,
-  },
-  {
-    id: 'libre-inversion',
-    name: 'Libre inversión',
-    balance: 12_000_000,
-    annualEffectiveRate: 0.21,
-    minimumPayment: 480_000,
-  },
-  {
-    id: 'tarjeta-b',
-    name: 'Tarjeta B',
-    balance: 1_800_000,
-    annualEffectiveRate: 0.28,
-    minimumPayment: 90_000,
-  },
-];
-
-export const EXAMPLE_BUDGET = 1_300_000;
+// Datos ficticios del caso dorado "tres-deudas-clasico", escritos como los teclearía una
+// persona. Sin primer pago: la fecha llega con la acción para no envejecer.
+export const EXAMPLE_PLAN: Omit<PlanForm, 'firstPayment'> = {
+  debts: [
+    {
+      id: 'tarjeta-a',
+      name: 'Tarjeta A',
+      balance: '4.500.000',
+      rate: '32',
+      rateType: 'EA',
+      minimumPayment: '225.000',
+    },
+    {
+      id: 'libre-inversion',
+      name: 'Libre inversión',
+      balance: '12.000.000',
+      rate: '21',
+      rateType: 'EA',
+      minimumPayment: '480.000',
+    },
+    {
+      id: 'tarjeta-b',
+      name: 'Tarjeta B',
+      balance: '1.800.000',
+      rate: '28',
+      rateType: 'EA',
+      minimumPayment: '90.000',
+    },
+  ],
+  monthlyBudget: '1.300.000',
+};

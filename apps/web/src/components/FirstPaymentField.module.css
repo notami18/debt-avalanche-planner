@@ -1,0 +1,35 @@
+.firstPayment {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.legend {
+  padding: 0;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.selects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.8125rem;
+}
+
+.field select {
+  font: inherit;
+  font-size: 1rem;
+  padding: 0.5rem;
+  border: 1px solid var(--roca);
+  border-radius: 6px;
+  background: var(--nieve);
+  color: var(--pizarra);
+}
