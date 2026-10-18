@@ -1,6 +1,7 @@
+import { simulate } from '@avalancha/engine';
 import { describe, expect, it } from 'vitest';
 import { createEmptyDebt } from './reducer.js';
-import { findIssues, issuesByField } from './issues.js';
+import { inputIssues, issuesByField } from './issues.js';
 import { toEngineInput } from './toEngineInput.js';
 
 const debts = [createEmptyDebt('a'), createEmptyDebt('b')];
@@ -35,20 +36,26 @@ describe('issuesByField', () => {
   });
 });
 
-describe('findIssues', () => {
+describe('inputIssues', () => {
   it('returns the engine issues for an empty row', () => {
-    const issues = findIssues(toEngineInput({ debts, monthlyBudget: '' }));
+    const result = simulate({
+      ...toEngineInput({ debts, monthlyBudget: '' }),
+      strategy: 'avalanche',
+    });
 
-    expect(issues).toContainEqual({ path: 'debts[0].balance', code: 'NOT_FINITE' });
+    expect(inputIssues(result)).toContainEqual({ path: 'debts[0].balance', code: 'NOT_FINITE' });
   });
 
   it('returns no issues when the input is valid', () => {
-    const issues = findIssues({
-      debts: [
-        { id: 'a', name: 'A', balance: 1000, annualEffectiveRate: 0.2, minimumPayment: 100 },
-      ],
-      monthlyBudget: 50,
-    });
+    const issues = inputIssues(
+      simulate({
+        debts: [
+          { id: 'a', name: 'A', balance: 1000, annualEffectiveRate: 0.2, minimumPayment: 100 },
+        ],
+        monthlyBudget: 50,
+        strategy: 'avalanche',
+      }),
+    );
 
     // Presupuesto insuficiente es INVALID_BUDGET, no un error de campo.
     expect(issues).toEqual([]);

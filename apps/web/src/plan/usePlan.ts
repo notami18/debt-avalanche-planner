@@ -1,10 +1,12 @@
-import type { ValidationCode, ValidationIssue } from '@avalancha/engine';
+import { compareStrategies } from '@avalancha/engine';
+import type { ValidationCode } from '@avalancha/engine';
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { fieldsInFormOrder } from './fields.js';
 import { nextMonth } from './firstPayment.js';
-import { findIssues, issuesByField } from './issues.js';
+import { inputIssues, issuesByField } from './issues.js';
 import { createEmptyPlan, planReducer } from './reducer.js';
 import { clearPlan, loadPlan, savePlan } from './storage.js';
+import type { StrategyKey } from './strategies.js';
 import { toEngineInput } from './toEngineInput.js';
 import type { DebtTextField, FieldKey, PlanForm, RateType } from './types.js';
 
@@ -21,13 +23,19 @@ export function usePlan() {
   // Estado de UI, no se persiste: qué campos ya se tocaron (SPEC-web §3).
   const [touched, setTouched] = useState<ReadonlySet<FieldKey>>(() => new Set());
   const [showAllErrors, setShowAllErrors] = useState(false);
+  const [selected, setSelected] = useState<StrategyKey>('avalanche');
 
   useEffect(() => {
     if (isEmptyPlan(form)) clearPlan();
     else savePlan(form);
   }, [form]);
 
-  const issues: ValidationIssue[] = useMemo(() => findIssues(toEngineInput(form)), [form]);
+  // Una sola llamada al motor: resultados y validación salen de aquí (SPEC-web §2).
+  const comparison = useMemo(() => {
+    const { debts, monthlyBudget } = toEngineInput(form);
+    return compareStrategies(debts, monthlyBudget);
+  }, [form]);
+  const issues = useMemo(() => inputIssues(comparison.avalanche), [comparison]);
   const fieldErrors = useMemo(() => issuesByField(issues, form.debts), [issues, form.debts]);
 
   const errorFor = (key: FieldKey): ValidationCode | undefined =>
@@ -37,9 +45,10 @@ export function usePlan() {
     setTouched((previous) => (previous.has(key) ? previous : new Set(previous).add(key)));
   }, []);
 
-  const resetErrors = () => {
+  const resetUi = () => {
     setTouched(new Set());
     setShowAllErrors(false);
+    setSelected('avalanche');
   };
 
   /** "Ver mi plan": muestra todos los errores y devuelve el primer campo con error. */
@@ -50,7 +59,10 @@ export function usePlan() {
 
   return {
     form,
+    comparison,
     issues,
+    selected,
+    select: setSelected,
     errorFor,
     touch,
     revealErrors,
@@ -64,11 +76,11 @@ export function usePlan() {
     setFirstPayment: (value: string) => dispatch({ type: 'setFirstPayment', value }),
     loadExample: () => {
       dispatch({ type: 'loadExample', firstPayment: nextMonth(new Date()) });
-      resetErrors();
+      resetUi();
     },
     clear: () => {
       dispatch({ type: 'clear', firstPayment: nextMonth(new Date()) });
-      resetErrors();
+      resetUi();
     },
   };
 }

@@ -94,9 +94,22 @@ detalle (por defecto, avalancha).
 |---|---|
 | Sin deudas | Estado vacío: *"Agrega tu primera deuda o carga un ejemplo para ver cómo funciona."* |
 | `INVALID_INPUT` | Mensaje en el campo exacto (según `path`) cuando ya se tocó (ver §3, "Errores en los campos"). Resultados en pausa: *"Completa los datos de tus deudas para ver tu plan."* |
-| `INVALID_BUDGET` | En el presupuesto: *"Para cubrir los mínimos necesitas al menos $X al mes."* |
-| `NOT_PAYABLE` | Hero alterno: *"Con estos pagos, esta deuda no se termina de pagar."* + `TrapNotice`. |
+| `INVALID_BUDGET` | En el presupuesto y en la columna de resultados (en pausa): *"Para cubrir los mínimos necesitas al menos $X al mes."* |
+| `NOT_PAYABLE` | Si es la estrategia seleccionada, hero alterno: *"Con estos pagos, esta deuda no se termina de pagar."* + `TrapNotice`. |
 | `PAID_OFF` | Hero con la fecha de libertad, comparación, orden de pago y cronograma. |
+
+### Estados mixtos
+- El estado general (sin deudas, `INVALID_INPUT`, `INVALID_BUDGET`) se lee de avalancha.
+  Si avalancha está en `INVALID_BUDGET`, los resultados quedan en pausa con el mensaje del
+  presupuesto, aunque solo mínimos sí se pague (solo mínimos no exige presupuesto).
+- Con datos válidos, cada estrategia puede quedar en `PAID_OFF` o `NOT_PAYABLE` por
+  separado. Caso típico: avalancha y bola de nieve pagan, pero solo mínimos no, porque la
+  cuota mínima de una tarjeta apenas cubre los intereses. Entonces:
+  - La montaña dibuja solo las estrategias `PAID_OFF`; el eje X va hasta la más larga.
+  - En la tabla, la fila de solo mínimos dice *"No se termina de pagar"* en vez de fecha
+    y meses.
+  - El ahorro frente a solo mínimos se reemplaza por: *"Pagando solo los mínimos, esta
+    deuda no se acabaría nunca."*
 
 `TrapNotice` (warning `MINIMUM_BELOW_INTEREST`): nombra la deuda y explica en una línea:
 *"La cuota mínima de Tarjeta grande no alcanza a cubrir los intereses del mes: la deuda
@@ -110,6 +123,10 @@ crece aunque pagues."*
    seleccionada toca cero, un marcador con la fecha: **"Libre en marzo de 2028"**, en la
    tipografía grande. Debajo, una línea: *"Pagarás $2.844.122 en intereses: $2.798.238
    menos que pagando solo los mínimos."*
+   - Solo se dibujan las estrategias `PAID_OFF`; el eje X va hasta la más larga de ellas.
+   - Variantes de la línea: sin diferencia, *"Pagarás $X en intereses, lo mismo que
+     pagando solo los mínimos."*; si solo mínimos es `NOT_PAYABLE`, *"Pagarás $X en
+     intereses. Pagando solo los mínimos, esta deuda no se acabaría nunca."*
    - Accesible: `<figure>` con `<figcaption>` que dice lo mismo en texto.
    - Una sola animación en toda la app: la cresta se dibuja una vez al aparecer el primer
      resultado. Desactivada con `prefers-reduced-motion`.
@@ -117,6 +134,10 @@ crece aunque pagues."*
    mínimos. Columnas: Libre en · Meses · Intereses totales · Ahorro frente a solo mínimos.
    La fila seleccionada se resalta; clic en una fila la selecciona. Una línea por
    estrategia explicando qué hace.
+   - Una fila `NOT_PAYABLE` dice *"No se termina de pagar"* en vez de fecha y meses, e
+     intereses "—".
+   - Si solo mínimos es `NOT_PAYABLE`, la columna de ahorro muestra "—" y bajo la tabla
+     va la nota *"Pagando solo los mínimos, esta deuda no se acabaría nunca."*
 3. **PayoffTimeline.** Lista ordenada (sí es una secuencia): qué deuda se cierra y cuándo.
 4. **Schedule.** `<details>` cerrado por defecto: "Ver el plan mes a mes". Tabla con mes,
    deuda, saldo inicial, interés, pago, saldo final. Muestra 24 meses y un botón

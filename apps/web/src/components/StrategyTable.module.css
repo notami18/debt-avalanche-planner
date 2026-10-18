@@ -1,0 +1,86 @@
+.wrapper {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+/* La tabla puede desplazarse sola en móvil; la página no. */
+.scroll {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.caption {
+  text-align: left;
+  font-weight: 700;
+  font-size: 1.125rem;
+  padding-bottom: 0.5rem;
+}
+
+.table th,
+.table td {
+  padding: 0.625rem 0.5rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--hielo);
+}
+
+.table thead th {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  vertical-align: bottom;
+}
+
+.table thead .number {
+  white-space: normal;
+}
+
+.table .number {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.date {
+  white-space: nowrap;
+}
+
+.table tbody tr {
+  cursor: pointer;
+}
+
+.selected {
+  box-shadow: inset 4px 0 0 var(--glaciar);
+}
+
+.selected th,
+.selected td {
+  font-weight: 700;
+}
+
+.strategy {
+  min-width: 10rem;
+}
+
+.name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.description {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.8125rem;
+  font-weight: 400;
+}
+
+.note {
+  margin: 0;
+  font-size: 0.875rem;
+}

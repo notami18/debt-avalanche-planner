@@ -39,15 +39,6 @@
   min-width: 0;
 }
 
-.results {
-  min-width: 0;
-}
-
-.resultsTitle {
-  margin: 0 0 0.5rem;
-  font-size: 1.25rem;
-}
-
 @media (min-width: 960px) {
   .page {
     padding: 1.5rem 2rem;

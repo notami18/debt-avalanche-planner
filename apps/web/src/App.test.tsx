@@ -86,6 +86,33 @@ describe('App', () => {
     expect(screen.queryByText(/equivale a/)).not.toBeInTheDocument();
   });
 
+  it('shows the results for the example and switches strategy from the table', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Cargar ejemplo' }));
+
+    const caption = () => screen.getByRole('figure').textContent?.replace(/\s/g, ' ');
+    expect(caption()).toContain('Pagarás $ 2.844.122 en intereses');
+    expect(screen.getByRole('radio', { name: 'Avalancha' })).toBeChecked();
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Bola de nieve' }));
+
+    expect(screen.getByRole('radio', { name: 'Bola de nieve' })).toBeChecked();
+    expect(caption()).toContain('Pagarás $ 2.874.112 en intereses');
+  });
+
+  it('shows the minimum budget under the budget field when it is too low', () => {
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Cargar ejemplo' }));
+
+    const budget = screen.getByLabelText('Presupuesto mensual');
+    fireEvent.change(budget, { target: { value: '500.000' } });
+
+    expect(budget).toHaveAttribute('aria-invalid', 'true');
+    expect(budget).toHaveAccessibleDescription(
+      /Para cubrir los mínimos necesitas al menos \$\s795\.000 al mes\./,
+    );
+  });
+
   it('restores the saved plan on reload', () => {
     const { unmount } = render(<App />);
     fireEvent.click(screen.getByRole('button', { name: 'Cargar ejemplo' }));

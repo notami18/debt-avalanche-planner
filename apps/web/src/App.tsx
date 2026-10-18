@@ -4,6 +4,7 @@ import { BudgetField } from './components/BudgetField.js';
 import { DebtList } from './components/DebtList.js';
 import { FirstPaymentField } from './components/FirstPaymentField.js';
 import { PlanActions } from './components/PlanActions.js';
+import { PlanResults } from './components/PlanResults.js';
 import { fieldId } from './plan/fields.js';
 import { usePlan } from './plan/usePlan.js';
 import buttons from './styles/buttons.module.css';
@@ -17,13 +18,6 @@ export function App() {
     const firstError = plan.revealErrors();
     if (firstError !== null) document.getElementById(fieldId(firstError))?.focus();
   };
-
-  const pausedMessage =
-    plan.form.debts.length === 0
-      ? 'Agrega tu primera deuda o carga un ejemplo para ver cómo funciona.'
-      : plan.issues.length > 0
-        ? 'Completa los datos de tus deudas para ver tu plan.'
-        : null;
 
   return (
     <div className={styles.page}>
@@ -43,12 +37,13 @@ export function App() {
           </div>
           <PlanActions onLoadExample={plan.loadExample} onClear={plan.clear} />
         </form>
-        <section className={styles.results} aria-labelledby="results-title" aria-live="polite">
-          <h2 id="results-title" className={styles.resultsTitle}>
-            Tu plan
-          </h2>
-          {pausedMessage && <p>{pausedMessage}</p>}
-        </section>
+        <PlanResults
+          hasDebts={plan.form.debts.length > 0}
+          comparison={plan.comparison}
+          selected={plan.selected}
+          onSelect={plan.select}
+          firstPayment={plan.form.firstPayment}
+        />
       </div>
     </div>
   );

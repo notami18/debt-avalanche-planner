@@ -1,12 +1,8 @@
-import { simulate } from '@avalancha/engine';
-import type { ValidationCode, ValidationIssue } from '@avalancha/engine';
+import type { SimulationResult, ValidationCode, ValidationIssue } from '@avalancha/engine';
 import { BUDGET_FIELD, debtFieldKey } from './fields.js';
-import type { EngineInput } from './toEngineInput.js';
 import type { DebtForm, DebtTextField, FieldKey } from './types.js';
 
-// La API pública valida dentro de simulate: aquí solo se leen sus issues.
-export function findIssues(input: EngineInput): ValidationIssue[] {
-  const result = simulate({ ...input, strategy: 'avalanche' });
+export function inputIssues(result: SimulationResult): ValidationIssue[] {
   return result.status === 'INVALID_INPUT' ? result.issues : [];
 }
 

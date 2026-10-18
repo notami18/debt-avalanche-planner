@@ -1,0 +1,144 @@
+.hero {
+  margin: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.chart {
+  position: relative;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* La única animación de la app: la cresta aparece de izquierda a derecha, una vez. */
+.draw {
+  animation: draw 1.2s ease-out both;
+}
+
+@keyframes draw {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .draw {
+    animation: none;
+  }
+}
+
+.baseline {
+  stroke: var(--roca);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.guide {
+  stroke: var(--roca);
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+  vector-effect: non-scaling-stroke;
+}
+
+.crest {
+  fill: none;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.area {
+  stroke: none;
+  fill-opacity: 0.22;
+}
+
+.selected .crest {
+  stroke-width: 3.5;
+}
+
+/* Color, trazo y grosor: el color nunca es la única señal (SPEC-web §6). */
+.avalanche {
+  stroke: var(--glaciar);
+  fill: var(--glaciar);
+}
+
+.snowball {
+  stroke: var(--hielo);
+  fill: var(--hielo);
+}
+
+.snowball .crest {
+  stroke-dasharray: 9 6;
+}
+
+.minimumOnly {
+  stroke: var(--roca);
+  fill: var(--roca);
+}
+
+.minimumOnly .crest {
+  stroke-dasharray: 0.5 7;
+  stroke-linecap: round;
+  stroke-width: 3;
+}
+
+.marker {
+  fill: var(--nieve);
+  stroke: var(--pizarra);
+  stroke-width: 2.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.label {
+  position: absolute;
+  top: 0;
+  margin: 0;
+  padding-inline: 0.5rem;
+  display: grid;
+  line-height: 1.1;
+}
+
+.labelEnd {
+  text-align: right;
+}
+
+.labelKicker {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.labelDate {
+  font-size: clamp(1.25rem, 4.5vw, 2.25rem);
+  font-weight: 800;
+  font-stretch: 125%;
+}
+
+.caption {
+  font-size: 1.125rem;
+  max-width: 60ch;
+}
+
+.notPayable {
+  margin: 0;
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
+  font-weight: 800;
+  font-stretch: 125%;
+  max-width: 30ch;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
