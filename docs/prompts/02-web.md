@@ -130,7 +130,7 @@ Lee docs/SPEC-web.md §4, §5 (puntos 1 y 2) y §6.
 Corre pnpm test y pnpm typecheck. Dime cómo verlo con pnpm dev.
 ```
 
-Commit: `feat(web): show payoff date, balance mountain and strategy comparison`
+Commit: `feat(web): 🧑‍💻 show payoff date, balance mountain and strategy comparison`
 
 **Revisá:** cargá el ejemplo y compará contra los casos dorados: avalancha 17 meses y
 $2.844.122 de intereses; bola de nieve $2.874.112; solo mínimos 33 meses y $5.642.360.
