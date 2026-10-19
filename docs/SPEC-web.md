@@ -65,19 +65,24 @@ Reglas:
   (al salir de él) o cuando presiona **"Ver mi plan"**. Una deuda recién agregada y vacía
   no muestra errores.
 - "Ver mi plan" (al final del formulario; también con Enter) muestra todos los errores y
-  lleva el foco al primer campo con error. No bloquea nada: con datos válidos el cálculo
-  sigue siendo en vivo.
+  lleva el foco al primer campo con error (con `INVALID_BUDGET`, al presupuesto). No
+  bloquea nada: con datos válidos el cálculo sigue siendo en vivo, y el botón lleva el
+  foco y el scroll al título "Tu plan" (scroll suave salvo `prefers-reduced-motion`).
 - Mientras haya errores, los resultados quedan en pausa sin gritar: el estado vacío (sin
   deudas) o *"Completa los datos de tus deudas para ver tu plan."*
 
 ### Plan
-- **Presupuesto mensual:** "¿Cuánto puedes destinar en total a tus deudas cada mes?"
+- **Presupuesto mensual:** la pregunta de ayuda *"¿Cuánto puedes destinar en total a tus
+  deudas cada mes?"* va entre la etiqueta y el campo. Placeholder *"Ej. 1.300.000"*: nunca
+  un número suelto que parezca un valor ya escrito.
 - **Primer pago:** selector de mes y año; por defecto, el mes siguiente al actual. Con él,
   el "mes N" del motor se convierte en fecha: `marzo de 2028`.
 - **Botón "Cargar ejemplo":** llena el caso ficticio `tres-deudas-clasico` de los casos
   dorados (Tarjeta A, Libre inversión, Tarjeta B; presupuesto $1.300.000).
 - **Botón "Borrar mis datos":** limpia el formulario y el almacenamiento, con confirmación
-  en línea: el botón se reemplaza por *"¿Borrar todo?"*, "Sí, borrar" y "Cancelar".
+  en línea: el botón se reemplaza por *"¿Borrar todo?"*, "Sí, borrar" y "Cancelar". Solo
+  aparece si hay datos (alguna deuda o el presupuesto escrito). Al borrar, el foco pasa a
+  "Cargar ejemplo".
 
 ### Persistencia
 - `localStorage`, clave `avalancha:plan:v1`, objeto `{ version: 1, ... }` con lo que el
@@ -92,7 +97,7 @@ detalle (por defecto, avalancha).
 
 | Resultado del motor | Qué muestra la UI |
 |---|---|
-| Sin deudas | Estado vacío: *"Agrega tu primera deuda o carga un ejemplo para ver cómo funciona."* |
+| Sin deudas | Estado vacío: *"Agrega tu primera deuda o carga un ejemplo para ver cómo funciona."* con sus propios botones "Agregar deuda" (enfoca el nombre de la deuda nueva) y "Cargar ejemplo". |
 | `INVALID_INPUT` | Mensaje en el campo exacto (según `path`) cuando ya se tocó (ver §3, "Errores en los campos"). Resultados en pausa: *"Completa los datos de tus deudas para ver tu plan."* |
 | `INVALID_BUDGET` | En el presupuesto y en la columna de resultados (en pausa): *"Para cubrir los mínimos necesitas al menos $X al mes."* |
 | `NOT_PAYABLE` | Si es la estrategia seleccionada, hero alterno: *"Con estos pagos, esta deuda no se termina de pagar."* + `TrapNotice`. |
@@ -132,6 +137,17 @@ por deuda afectada.
      fecha (*"Solo mínimos: julio de 2029"*) y una muestra de línea con su mismo trazo.
      Si dos crestas no seleccionadas terminan el mismo mes, van en una sola etiqueta
      (*"Avalancha y Bola de nieve: marzo de 2028"*).
+   - Si una cresta no seleccionada termina el mismo mes que la seleccionada, no lleva
+     etiqueta propia: debajo de la fecha grande va *"igual con bola de nieve"* (o *"igual
+     con avalancha"*, *"igual con avalancha y bola de nieve"*). El texto del
+     `<figcaption>` también lo dice.
+   - El dibujo deja margen abajo y a la derecha dentro del `viewBox`: el marcador nunca
+     sale cortado.
+   - Cuando el gráfico mide menos de 600px (móvil, o la columna de resultados en una
+     ventana de escritorio estrecha; se resuelve con container queries): la fecha grande
+     se achica con `clamp()` y pasa arriba del gráfico (no se pisa con "Hoy"), y las
+     etiquetas de las crestas pasan a una leyenda debajo del gráfico, cada una con su
+     muestra de trazo. Nada queda cortado.
    - En la cima, una etiqueta con el saldo inicial: *"Hoy: $ 18.300.000"*.
    - Variantes de la línea: sin diferencia, *"Pagarás $X en intereses, lo mismo que
      pagando solo los mínimos."*; si solo mínimos es `NOT_PAYABLE`, *"Pagarás $X en
@@ -143,6 +159,11 @@ por deuda afectada.
    mínimos. Columnas: Libre en · Meses · Intereses totales · Ahorro frente a solo mínimos.
    La fila seleccionada se resalta; clic en una fila la selecciona. Una línea por
    estrategia explicando qué hace.
+   - Cuando la tabla mide menos de 600px (container query) cada estrategia se muestra
+     como un bloque apilado (nombre, libre en, meses, intereses y ahorro visibles sin
+     deslizar). Sigue siendo una `<table>`: solo cambia el CSS, con roles ARIA explícitos
+     (`table`, `row`, `columnheader`, `rowheader`, `cell`) para que no pierda la semántica
+     al cambiar el `display`.
    - Una fila `NOT_PAYABLE` dice *"No se termina de pagar"* en vez de fecha y meses, e
      intereses "—".
    - Si solo mínimos es `NOT_PAYABLE`, la columna de ahorro muestra "—" y bajo la tabla
@@ -168,14 +189,16 @@ La montaña del hero es lo único llamativo; todo lo demás es sobrio y numéric
 |---|---|---|---|
 | `--nieve` | `#F2F5F7` | `#14222C` | Fondo |
 | `--pizarra` | `#1C2A35` | `#E6EDF1` | Texto principal |
-| `--roca` | `#6E7D89` | `#93A3AF` | Texto secundario, "Solo mínimos" |
+| `--roca` | `#63707B` | `#93A3AF` | Texto secundario, "Solo mínimos" |
 | `--glaciar` | `#2C6A8A` | `#6FB1D2` | Acento, avalancha, foco |
-| `--hielo` | `#A9C8D8` | `#3C6278` | Bola de nieve, rellenos suaves |
-| `--senal` | `#D99A1E` | `#E8B54A` | Alertas (trampa de mínimos) |
+| `--hielo` | `#A9C8D8` | `#3C6278` | Bordes y rellenos decorativos |
+| `--hielo-trazo` | `#5592B2` | `#46738C` | Línea de bola de nieve |
+| `--senal` | `#B58119` | `#E8B54A` | Alertas (trampa de mínimos) |
 
 - Modo oscuro con `prefers-color-scheme`; el `body` siempre con fondo explícito.
-- Contraste AA mínimo en todo texto. El color nunca es la única señal: las líneas de la
-  montaña también se distinguen por grosor y trazo (sólida, discontinua, punteada).
+- Contraste AA mínimo en todo texto (4.5:1) y 3:1 en trazos y bordes que informan. El
+  color nunca es la única señal: las líneas de la montaña también se distinguen por
+  grosor y trazo (sólida, discontinua, punteada).
 
 ### Tipografía
 - **Una sola familia: Archivo** (variable, con eje de ancho), autoalojada con
@@ -213,7 +236,8 @@ MAYÚSCULAS, flechas `→` en los botones, animaciones de entrada en cada secci�
 monoespaciadas para datos.
 
 ### Calidad mínima
-Responsive hasta 360px sin scroll horizontal, foco de teclado visible (`--glaciar`),
+Responsive hasta 360px sin scroll horizontal (revisado en 360, 768 y 1280px, en claro y
+oscuro), foco de teclado visible (`--glaciar`),
 todos los inputs con `<label>`, errores conectados con `aria-describedby`,
 `prefers-reduced-motion` respetado.
 
