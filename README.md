@@ -1,5 +1,9 @@
 # Avalancha 🏔️
 
+[![Deploy](https://github.com/notami18/debt-avalanche-planner/actions/workflows/deploy.yml/badge.svg)](https://github.com/notami18/debt-avalanche-planner/actions/workflows/deploy.yml)
+
+**Pruébala:** <https://notami18.github.io/debt-avalanche-planner/>
+
 Simulador para salir de deudas, hecho para personas en Colombia. Escribes tus deudas
 (saldo, tasa y cuota mínima) y cuánto puedes pagar al mes, y la app te dice **cuándo
 quedas libre y cuánto te ahorras en intereses** según cómo repartas el dinero:
