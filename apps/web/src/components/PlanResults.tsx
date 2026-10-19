@@ -1,7 +1,9 @@
 import type { Debt, StrategyComparison } from '@avalancha/engine';
+import type { RefObject } from 'react';
 import { useEffect, useMemo, useRef } from 'react';
 import { resultMessages } from '../i18n/resultMessages.js';
 import type { StrategyKey } from '../plan/strategies.js';
+import buttons from '../styles/buttons.module.css';
 import { FreedomHero, NotPayableHero } from './FreedomHero.js';
 import { PayoffTimeline } from './PayoffTimeline.js';
 import styles from './PlanResults.module.css';
@@ -10,11 +12,15 @@ import { StrategyTable } from './StrategyTable.js';
 import { TrapNotice } from './TrapNotice.js';
 
 interface PlanResultsProps {
+  /** "Ver mi plan" lleva el foco a este título. */
+  titleRef?: RefObject<HTMLHeadingElement | null>;
   debts: readonly Debt[];
   comparison: StrategyComparison;
   selected: StrategyKey;
   onSelect: (key: StrategyKey) => void;
   firstPayment: string;
+  onAddDebt: () => void;
+  onLoadExample: () => void;
 }
 
 // SPEC-web §4: el estado general se lee de avalancha; cada estrategia, por separado.
@@ -29,11 +35,14 @@ function pausedMessage(hasDebts: boolean, comparison: StrategyComparison): strin
 }
 
 export function PlanResults({
+  titleRef,
   debts,
   comparison,
   selected,
   onSelect,
   firstPayment,
+  onAddDebt,
+  onLoadExample,
 }: PlanResultsProps) {
   const paused = pausedMessage(debts.length > 0, comparison);
   const debtNames = useMemo(() => new Map(debts.map((debt) => [debt.id, debt.name])), [debts]);
@@ -49,10 +58,22 @@ export function PlanResults({
 
   return (
     <section className={styles.results} aria-labelledby="results-title">
-      <h2 id="results-title" className={styles.title}>
+      <h2 id="results-title" ref={titleRef} className={styles.title} tabIndex={-1}>
         Tu plan
       </h2>
-      {paused !== null ? (
+      {debts.length === 0 ? (
+        <div className={styles.empty}>
+          <p role="status">{resultMessages.empty}</p>
+          <div className={styles.emptyActions}>
+            <button type="button" className={buttons.button} onClick={onAddDebt}>
+              Agregar deuda
+            </button>
+            <button type="button" className={buttons.button} onClick={onLoadExample}>
+              Cargar ejemplo
+            </button>
+          </div>
+        </div>
+      ) : paused !== null ? (
         <p role="status">{paused}</p>
       ) : (
         <>

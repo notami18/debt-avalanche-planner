@@ -8,6 +8,9 @@ interface TextFieldProps {
   onBlur: () => void;
   inputMode?: 'text' | 'numeric' | 'decimal' | undefined;
   placeholder?: string | undefined;
+  /** Ayuda entre la etiqueta y el campo: la pregunta que el campo responde. */
+  help?: string | undefined;
+  /** Ayuda debajo del campo, p. ej. la equivalencia en vivo de la tasa. */
   hint?: string | undefined;
   error?: string | undefined;
 }
@@ -20,12 +23,14 @@ export function TextField({
   onBlur,
   inputMode = 'text',
   placeholder,
+  help,
   hint,
   error,
 }: TextFieldProps) {
+  const helpId = `${id}-help`;
   const hintId = `${id}-hint`;
   const errorId = `${id}-error`;
-  const describedBy = [hint ? hintId : null, error ? errorId : null]
+  const describedBy = [help ? helpId : null, hint ? hintId : null, error ? errorId : null]
     .filter((part) => part !== null)
     .join(' ');
 
@@ -34,6 +39,11 @@ export function TextField({
       <label className={styles.label} htmlFor={id}>
         {label}
       </label>
+      {help && (
+        <p id={helpId} className={styles.hint}>
+          {help}
+        </p>
+      )}
       <input
         id={id}
         className={styles.input}

@@ -9,7 +9,8 @@ import type { StrategyKey } from '../plan/strategies.js';
 import { interestSummary } from '../plan/summary.js';
 import type { InterestSummary } from '../plan/summary.js';
 import styles from './FreedomHero.module.css';
-import { HEIGHT, WIDTH, mountainGeometry } from './mountainGeometry.js';
+import { BASELINE, HEIGHT, WIDTH, mountainGeometry } from './mountainGeometry.js';
+import type { EndLabel } from './mountainGeometry.js';
 
 interface FreedomHeroProps {
   comparison: StrategyComparison;
@@ -21,6 +22,13 @@ interface FreedomHeroProps {
 
 const strategyName = (key: StrategyKey) =>
   STRATEGIES.find((strategy) => strategy.key === key)?.name ?? key;
+
+/** "igual con bola de nieve": las crestas que terminan el mismo mes que la elegida. */
+function tiedText(keys: readonly StrategyKey[]): string | null {
+  if (keys.length === 0) return null;
+  const names = keys.map((key) => strategyName(key).toLocaleLowerCase('es-CO'));
+  return `igual con ${names.join(' y ')}`;
+}
 
 function interestSentence(summary: InterestSummary): string {
   const interest = `Pagarás ${formatMoney(summary.interest)} en intereses`;
@@ -62,55 +70,77 @@ export function FreedomHero({ comparison, selected, firstPayment, animate }: Fre
   const { marker, summit } = geometry;
   const dateOf = (month: number) => formatMonthYear(monthToDate(firstPayment, month));
   const freedomDate = dateOf(marker.month);
+  const tied = tiedText(geometry.tiedWith);
+  const endLabelText = (label: EndLabel) =>
+    `${label.keys.map(strategyName).join(' y ')}: ${dateOf(label.month)}`;
 
   return (
     <figure className={styles.hero}>
       <div className={styles.chart} aria-hidden="true">
-        <svg
-          className={animateOnMount ? `${styles.svg} ${styles.draw}` : styles.svg}
-          viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
-          role="presentation"
-        >
-          <line className={styles.baseline} x1={0} y1={HEIGHT} x2={WIDTH} y2={HEIGHT} />
-          <line className={styles.guide} x1={marker.x} y1={HEIGHT} x2={marker.x} y2={0} />
-          {geometry.crests.map((crest) => (
-            <g
-              key={crest.key}
-              data-strategy={crest.key}
-              className={`${styles[crest.key]} ${crest.area ? styles.selected : ''}`}
-            >
-              {crest.area && <path className={styles.area} d={crest.area} />}
-              <path className={styles.crest} d={crest.line} />
-            </g>
-          ))}
-          <circle className={styles.marker} cx={marker.x} cy={HEIGHT} r={7} />
-        </svg>
-        <p className={styles.summit} style={{ top: `${summit.yPercent}%` }}>
-          Hoy: {formatMoney(summit.balance)}
-        </p>
         <p
           className={marker.xPercent <= 50 ? styles.label : `${styles.label} ${styles.labelEnd}`}
           style={horizontalAnchor(marker.xPercent)}
         >
           <span className={styles.labelKicker}>Libre en</span>
           <span className={styles.labelDate}>{freedomDate}</span>
+          {tied && <span className={styles.labelTied}>{tied}</span>}
         </p>
-        {geometry.endLabels.map((label) => (
-          <p
-            key={label.month}
-            data-end-label={label.keys.join(' ')}
-            className={styles.endLabel}
-            style={{ ...horizontalAnchor(label.xPercent), bottom: `${0.5 + label.row * 1.75}rem` }}
+        <div className={styles.plot}>
+          <svg
+            className={animateOnMount ? `${styles.svg} ${styles.draw}` : styles.svg}
+            viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+            role="presentation"
           >
-            {label.keys.map((key) => (
-              <StrokeSwatch key={key} strategy={key} />
+            <line className={styles.baseline} x1={0} y1={BASELINE} x2={WIDTH} y2={BASELINE} />
+            <line className={styles.guide} x1={marker.x} y1={BASELINE} x2={marker.x} y2={0} />
+            {geometry.crests.map((crest) => (
+              <g
+                key={crest.key}
+                data-strategy={crest.key}
+                className={`${styles[crest.key]} ${crest.area ? styles.selected : ''}`}
+              >
+                {crest.area && <path className={styles.area} d={crest.area} />}
+                <path className={styles.crest} d={crest.line} />
+              </g>
             ))}
-            {label.keys.map(strategyName).join(' y ')}: {dateOf(label.month)}
+            <circle className={styles.marker} cx={marker.x} cy={BASELINE} r={7} />
+          </svg>
+          <p className={styles.summit} style={{ top: `${summit.yPercent}%` }}>
+            Hoy: {formatMoney(summit.balance)}
           </p>
-        ))}
+          {geometry.endLabels.map((label) => (
+            <p
+              key={label.month}
+              data-end-label={label.keys.join(' ')}
+              className={styles.endLabel}
+              style={{ ...horizontalAnchor(label.xPercent), bottom: `${0.5 + label.row * 1.75}rem` }}
+            >
+              {label.keys.map((key) => (
+                <StrokeSwatch key={key} strategy={key} />
+              ))}
+              {endLabelText(label)}
+            </p>
+          ))}
+        </div>
+        {/* En gráficos angostos las etiquetas pasan a esta leyenda (SPEC-web §5.1). */}
+        {geometry.endLabels.length > 0 && (
+          <ul className={styles.legend}>
+            {geometry.endLabels.map((label) => (
+              <li key={label.month} className={styles.legendItem}>
+                {label.keys.map((key) => (
+                  <StrokeSwatch key={key} strategy={key} />
+                ))}
+                {endLabelText(label)}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
       <figcaption className={styles.caption}>
-        <span className={styles.visuallyHidden}>Libre en {freedomDate}. </span>
+        <span className={styles.visuallyHidden}>
+          Libre en {freedomDate}
+          {tied && `, ${tied}`}.{' '}
+        </span>
         {interestSentence(summary)}
       </figcaption>
     </figure>

@@ -20,6 +20,12 @@
   color: var(--pizarra);
 }
 
+/* El gris por defecto del navegador no llega a AA sobre --nieve. */
+.input::placeholder {
+  color: var(--roca);
+  opacity: 1;
+}
+
 .input[aria-invalid='true'] {
   border: 2px solid var(--senal);
 }

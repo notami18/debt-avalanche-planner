@@ -24,9 +24,9 @@ export function BudgetField({ plan }: BudgetFieldProps) {
       <TextField
         id={fieldId(BUDGET_FIELD)}
         label="Presupuesto mensual"
-        hint="¿Cuánto puedes destinar en total a tus deudas cada mes?"
+        help="¿Cuánto puedes destinar en total a tus deudas cada mes?"
         inputMode="numeric"
-        placeholder="1.300.000"
+        placeholder="Ej. 1.300.000"
         value={plan.form.monthlyBudget}
         onChange={plan.setBudget}
         onBlur={() => plan.touch(BUDGET_FIELD)}

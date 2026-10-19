@@ -2,7 +2,7 @@ import { compareStrategies } from '@avalancha/engine';
 import type { MonthRow, StrategyComparison } from '@avalancha/engine';
 import { describe, expect, it } from 'vitest';
 import { CLASSIC, MINIMUM_NEVER_ENDS, MINIMUM_TRAP } from '../../test/cases.js';
-import { mountainGeometry, mountainScale } from './mountainGeometry.js';
+import { BASELINE, HEIGHT, WIDTH, mountainGeometry, mountainScale } from './mountainGeometry.js';
 
 /** Un resultado PAID_OFF de una sola deuda a partir de la serie de saldos. */
 function paidOff(series: number[]) {
@@ -50,14 +50,15 @@ describe('mountainGeometry', () => {
     expect(geometry?.summit.balance).toBe(100);
   });
 
-  it('labels the end of every unselected crest (classic case)', () => {
+  it('labels the end of unselected crests, except those tied with the selected one (classic case)', () => {
     const { debts, monthlyBudget } = CLASSIC;
     const geometry = mountainGeometry(compareStrategies(debts, monthlyBudget), 'avalanche');
 
     expect(geometry?.summit.balance).toBe(18_300_000);
     expect(geometry?.marker.month).toBe(17);
+    // Bola de nieve termina el mismo mes: va como "igual con bola de nieve", sin etiqueta.
+    expect(geometry?.tiedWith).toEqual(['snowball']);
     expect(geometry?.endLabels.map(({ keys, month }) => ({ keys, month }))).toEqual([
-      { keys: ['snowball'], month: 17 },
       { keys: ['minimumOnly'], month: 33 },
     ]);
     // La seleccionada se dibuja al final y es la única con relleno.
@@ -72,9 +73,21 @@ describe('mountainGeometry', () => {
     const { debts, monthlyBudget } = CLASSIC;
     const geometry = mountainGeometry(compareStrategies(debts, monthlyBudget), 'minimumOnly');
 
+    expect(geometry?.tiedWith).toEqual([]);
     expect(geometry?.endLabels.map(({ keys, month }) => ({ keys, month }))).toEqual([
       { keys: ['avalanche', 'snowball'], month: 17 },
     ]);
+  });
+
+  it('keeps the marker inside the viewBox when the selected crest is the longest', () => {
+    const { debts, monthlyBudget } = CLASSIC;
+    const geometry = mountainGeometry(compareStrategies(debts, monthlyBudget), 'minimumOnly');
+    const radius = 7;
+
+    // El marcador se dibuja en (marker.x, BASELINE): radio y trazo caben en el viewBox.
+    expect(geometry?.marker.x).toBeLessThanOrEqual(WIDTH - radius - 2);
+    expect(BASELINE + radius + 2).toBeLessThanOrEqual(HEIGHT);
+    expect(geometry?.crests.at(-1)?.area).toMatch(new RegExp(`L0 ${BASELINE} Z$`));
   });
 
   it('stacks end labels that would overlap', () => {
@@ -94,7 +107,9 @@ describe('mountainGeometry', () => {
     const geometry = mountainGeometry(compareStrategies(debts, monthlyBudget), 'avalanche');
 
     expect(geometry?.crests.map((crest) => crest.key)).toEqual(['snowball', 'avalanche']);
-    expect(geometry?.endLabels.flatMap((label) => label.keys)).toEqual(['snowball']);
+    // Solo mínimos no aparece en ningún lado; bola de nieve termina el mismo mes que avalancha.
+    expect(geometry?.tiedWith).toEqual(['snowball']);
+    expect(geometry?.endLabels).toEqual([]);
   });
 
   it('is null when the selected strategy does not pay off', () => {

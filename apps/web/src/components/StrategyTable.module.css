@@ -2,6 +2,7 @@
   display: grid;
   gap: 0.5rem;
   min-width: 0;
+  container-type: inline-size;
 }
 
 /* La tabla puede desplazarse sola en móvil; la página no. */
@@ -83,4 +84,66 @@
 .note {
   margin: 0;
   font-size: 0.875rem;
+}
+
+/* Tabla angosta: cada estrategia es un bloque apilado, con todo visible sin deslizar.
+   Sigue siendo una <table> (con roles explícitos en el TSX); solo cambia el display. */
+@container (max-width: 599px) {
+  .scroll {
+    overflow-x: visible;
+  }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table th,
+  .table td {
+    display: block;
+  }
+
+  .table caption {
+    display: block;
+  }
+
+  /* Los encabezados quedan para lectores de pantalla; a la vista los da cada celda. */
+  .head {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .table tbody tr {
+    padding: 0.75rem 0.75rem 0.75rem 1rem;
+    border-bottom: 1px solid var(--hielo);
+  }
+
+  .table th,
+  .table td {
+    padding: 0;
+    border-bottom: 0;
+  }
+
+  .strategy {
+    min-width: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding-block: 0.125rem;
+    text-align: right;
+  }
+
+  .table td::before {
+    content: attr(data-label);
+    font-size: 0.8125rem;
+    font-weight: 400;
+    text-align: left;
+  }
 }

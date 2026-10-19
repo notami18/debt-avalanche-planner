@@ -5,6 +5,10 @@ import type { StrategyKey } from '../plan/strategies.js';
 
 export const WIDTH = 640;
 export const HEIGHT = 280;
+// Margen abajo y a la derecha: el marcador (r = 7 + trazo) no sale cortado del viewBox.
+const MARGIN = 12;
+export const BASELINE = HEIGHT - MARGIN;
+const PLOT_RIGHT = WIDTH - MARGIN;
 // Espacio libre arriba para las etiquetas "Libre en …" y "Hoy: …".
 const HEADROOM = 110;
 // Etiquetas finales más cerca que esto (en % del ancho) se apilan en otra fila.
@@ -31,6 +35,8 @@ export interface MountainGeometry {
   crests: Crest[];
   marker: { x: number; xPercent: number; month: number };
   summit: { balance: number; yPercent: number };
+  /** No seleccionadas que terminan el mismo mes que la seleccionada: van sin etiqueta. */
+  tiedWith: StrategyKey[];
   endLabels: EndLabel[];
 }
 
@@ -73,8 +79,8 @@ export function mountainGeometry(
       : [];
   });
   const { maxMonths, maxBalance } = mountainScale(paid.map((crest) => crest.series));
-  const x = (month: number) => (month / maxMonths) * WIDTH;
-  const y = (balance: number) => HEIGHT - (balance / maxBalance) * (HEIGHT - HEADROOM);
+  const x = (month: number) => (month / maxMonths) * PLOT_RIGHT;
+  const y = (balance: number) => BASELINE - (balance / maxBalance) * (BASELINE - HEADROOM);
   const line = (series: number[]) =>
     series
       .map((balance, month) => `${month === 0 ? 'M' : 'L'}${x(month).toFixed(1)} ${y(balance).toFixed(1)}`)
@@ -89,12 +95,14 @@ export function mountainGeometry(
     return {
       key,
       line: path,
-      area: key === selected ? `${path} L${x(months).toFixed(1)} ${HEIGHT} L0 ${HEIGHT} Z` : null,
+      area: key === selected ? `${path} L${x(months).toFixed(1)} ${BASELINE} L0 ${BASELINE} Z` : null,
     };
   });
 
   const toPercent = (month: number) => (x(month) / WIDTH) * 100;
   const initialBalance = paid.find((crest) => crest.key === selected)?.series[0] ?? 0;
+  const others = paid.filter((crest) => crest.key !== selected);
+  const isTied = (crest: { months: number }) => crest.months === selectedResult.months;
 
   return {
     maxMonths,
@@ -106,8 +114,9 @@ export function mountainGeometry(
       month: selectedResult.months,
     },
     summit: { balance: initialBalance, yPercent: (y(initialBalance) / HEIGHT) * 100 },
+    tiedWith: others.filter(isTied).map((crest) => crest.key),
     endLabels: groupEndLabels(
-      paid.filter((crest) => crest.key !== selected),
+      others.filter((crest) => !isTied(crest)),
       toPercent,
     ),
   };

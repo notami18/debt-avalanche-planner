@@ -3,10 +3,11 @@
 
   --nieve: #f2f5f7;
   --pizarra: #1c2a35;
-  --roca: #6e7d89;
+  --roca: #63707b;
   --glaciar: #2c6a8a;
   --hielo: #a9c8d8;
-  --senal: #d99a1e;
+  --hielo-trazo: #5592b2;
+  --senal: #b58119;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -16,6 +17,7 @@
     --roca: #93a3af;
     --glaciar: #6fb1d2;
     --hielo: #3c6278;
+    --hielo-trazo: #46738c;
     --senal: #e8b54a;
   }
 }

@@ -1,7 +1,7 @@
 import { compareStrategies } from '@avalancha/engine';
 import type { ValidationCode } from '@avalancha/engine';
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
-import { fieldsInFormOrder } from './fields.js';
+import { BUDGET_FIELD, fieldsInFormOrder } from './fields.js';
 import { nextMonth } from './firstPayment.js';
 import { inputIssues, issuesByField } from './issues.js';
 import { createEmptyPlan, planReducer } from './reducer.js';
@@ -55,11 +55,15 @@ export function usePlan() {
   /** "Ver mi plan": muestra todos los errores y devuelve el primer campo con error. */
   const revealErrors = (): FieldKey | null => {
     setShowAllErrors(true);
-    return fieldsInFormOrder(form.debts).find((key) => fieldErrors.has(key)) ?? null;
+    const firstError = fieldsInFormOrder(form.debts).find((key) => fieldErrors.has(key));
+    if (firstError !== undefined) return firstError;
+    // INVALID_BUDGET no es un issue de campo, pero se muestra en el presupuesto.
+    return comparison.avalanche.status === 'INVALID_BUDGET' ? BUDGET_FIELD : null;
   };
 
   return {
     form,
+    hasData: !isEmptyPlan(form),
     debts: engineInput.debts,
     comparison,
     issues,
@@ -68,7 +72,12 @@ export function usePlan() {
     errorFor,
     touch,
     revealErrors,
-    addDebt: () => dispatch({ type: 'addDebt', id: crypto.randomUUID() }),
+    /** Devuelve el id de la deuda nueva, para poder enfocarla. */
+    addDebt: () => {
+      const id = crypto.randomUUID();
+      dispatch({ type: 'addDebt', id });
+      return id;
+    },
     updateDebt: (id: string, field: DebtTextField, value: string) =>
       dispatch({ type: 'updateDebt', id, field, value }),
     setRateType: (id: string, rateType: RateType) =>

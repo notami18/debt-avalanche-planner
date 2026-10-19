@@ -42,7 +42,8 @@ describe('golden UI: tres-deudas-clasico', () => {
 
   it('the strategy table shows the fixture months and total interest', () => {
     render(<App />);
-    fireEvent.click(screen.getByRole('button', { name: 'Cargar ejemplo' }));
+    const form = screen.getByRole('form', { name: 'Tus datos' });
+    fireEvent.click(within(form).getByRole('button', { name: 'Cargar ejemplo' }));
 
     const table = screen.getByRole('table', { name: 'Comparación de estrategias' });
     for (const [key, name] of Object.entries(ROW_NAMES) as [FixtureStrategyKey, string][]) {

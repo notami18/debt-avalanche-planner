@@ -22,6 +22,8 @@ function renderResults({ debts, monthlyBudget }: TestCase, selected: StrategyKey
       selected={selected}
       onSelect={() => {}}
       firstPayment="2027-01"
+      onAddDebt={() => {}}
+      onLoadExample={() => {}}
     />,
   );
 }
@@ -35,6 +37,8 @@ describe('PlanResults', () => {
     renderResults({ debts: [], monthlyBudget: Number.NaN });
 
     expect(screen.getByRole('status')).toHaveTextContent(resultMessages.empty);
+    expect(screen.getByRole('button', { name: 'Agregar deuda' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Cargar ejemplo' })).toBeInTheDocument();
   });
 
   it('pauses quietly while the input is invalid', () => {
@@ -58,8 +62,12 @@ describe('PlanResults', () => {
     renderResults(CLASSIC);
 
     expect(normalize(screen.getByRole('figure').textContent)).toContain(
-      'Libre en mayo de 2028. Pagarás $ 2.844.122 en intereses: $ 2.798.238 menos que pagando solo los mínimos.',
+      'Libre en mayo de 2028, igual con bola de nieve. Pagarás $ 2.844.122 en intereses: $ 2.798.238 menos que pagando solo los mínimos.',
     );
+    // Bola de nieve termina el mismo mes: sin etiqueta propia; solo mínimos sí la lleva.
+    expect(
+      [...document.querySelectorAll('[data-end-label]')].map((label) => label.textContent),
+    ).toEqual(['Solo mínimos: septiembre de 2029']);
     const expected = [
       ['Avalancha', 'mayo de 2028', '17', '$ 2.844.122', '$ 2.798.238'],
       ['Bola de nieve', 'mayo de 2028', '17', '$ 2.874.112', '$ 2.768.248'],

@@ -2,9 +2,12 @@
   margin: 0;
   display: grid;
   gap: 0.75rem;
+  /* El cambio a leyenda depende del ancho del gráfico, no de la ventana (SPEC-web §5.1). */
+  container-type: inline-size;
 }
 
-.chart {
+.chart,
+.plot {
   position: relative;
 }
 
@@ -15,9 +18,11 @@
   overflow: visible;
 }
 
-/* La única animación de la app: la cresta aparece de izquierda a derecha, una vez. */
+/* La única animación de la app: la cresta aparece de izquierda a derecha, una vez.
+   `backwards` y no `both`: al terminar se quita el clip-path, que si no recorta lo que
+   sobresale del SVG. */
 .draw {
-  animation: draw 1.2s ease-out both;
+  animation: draw 1.2s ease-out backwards;
 }
 
 @keyframes draw {
@@ -71,8 +76,8 @@
 }
 
 .snowball {
-  stroke: var(--hielo);
-  fill: var(--hielo);
+  stroke: var(--hielo-trazo);
+  fill: var(--hielo-trazo);
 }
 
 .snowball .crest {
@@ -116,9 +121,15 @@
 }
 
 .labelDate {
-  font-size: clamp(1.25rem, 4.5vw, 2.25rem);
+  font-size: clamp(1.125rem, 5cqi, 2.25rem);
   font-weight: 800;
   font-stretch: 125%;
+}
+
+.labelTied {
+  margin-top: 0.125rem;
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
 .summit {
@@ -139,10 +150,43 @@
   align-items: center;
   gap: 0.375rem;
   font-size: 0.8125rem;
-  white-space: nowrap;
   /* Las líneas pasan por detrás del texto. */
   background: var(--nieve);
   border-radius: 4px;
+}
+
+.legend {
+  display: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  gap: 0.25rem;
+  font-size: 0.875rem;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+/* Gráfico angosto: la fecha va arriba (no se pisa con "Hoy") y las etiquetas de las
+   crestas pasan a la leyenda de abajo. */
+@container (max-width: 599px) {
+  .label {
+    position: static;
+    padding-inline: 0;
+    margin-bottom: 0.75rem;
+    text-align: left;
+  }
+
+  .endLabel {
+    display: none;
+  }
+
+  .legend {
+    display: grid;
+  }
 }
 
 .swatch {
